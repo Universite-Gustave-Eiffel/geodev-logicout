@@ -26,4 +26,6 @@ European Union Public Licence (EUPL) version 1.2</a>.
 
 - Nicolas Roelandt - Univ. Eiffel/AME
 - Clovis Bergeret - ENSG
-
+- Gautier Tabordet - ENSG
+- Claire Girardin - ENSG
+- Thiago Rabacal - ENSG
