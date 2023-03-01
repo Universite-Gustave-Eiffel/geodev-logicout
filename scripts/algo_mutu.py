@@ -1,3 +1,2 @@
-import numpy as np
-
-print(np.zeros(6))
+import numpy
+#
