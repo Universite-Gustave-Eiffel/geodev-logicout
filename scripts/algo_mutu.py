@@ -13,7 +13,7 @@ def dist(coordA,coordB):
 
 def is_mutu(ArrayA,ArrayB):
     '''
-    Takes two arrays, one for a producer A, one for a producer B, and returns a boolean whether or not the mutualisation is possible
+    Takes two arrays, one for a producer A, one for a producer B, and returns a boolean showing whether or not the mutualisation is possible
     (0 being not possible, 1 being possible)
     '''
     startA = ArrayA[0]
@@ -35,3 +35,43 @@ def is_mutu(ArrayA,ArrayB):
         return True
     else:
         return  False
+    
+def is_mutu_3(ArrayA,ArrayB,ArrayC):
+    '''
+    Takes three arrays of producers' routes, and returns a boolean showing whether or not the mutualisation is possible
+    (0 being not possible, 1 being possible)
+    '''
+    startA = ArrayA[0]
+    startB = ArrayB[0]
+    startC = ArrayC[0]
+    
+    A = True
+    B = True
+    C = True
+    
+    for coord in ArrayA:
+        if dist(coord,startB)>rayon:
+            B = False
+            break
+        if dist(coord,startC)>rayon:
+            C = False
+            break
+    for coord in ArrayB:
+        if dist(coord,startA)>rayon:
+            A = False
+            break
+        if dist(coord,startC)>rayon:
+            C = False
+            break
+    for coord in ArrayC:
+        if dist(coord,startA)>rayon:
+            A = False
+            break
+        if dist(coord,startB)>rayon:
+            B = False
+            break
+    
+    if A == True and B == True and C == True:
+        return True
+    else:
+        return False
