@@ -25,4 +25,5 @@ European Union Public Licence (EUPL) version 1.2</a>.
 # Contributors
 
 - Nicolas Roelandt - Univ. Eiffel/AME
+- Clovis Bergeret - ENSG
 
