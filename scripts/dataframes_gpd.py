@@ -89,7 +89,6 @@ geo_df = geo_df[geo_df['geometry'].is_valid==True]
 
 
 
-
 df_communes = gpd.read_file(root + "/data/assets/COMMUNE.shp")  # Layer IGN
 df_cheflieu = gpd.read_file(root + "/data/assets/CHFLIEU_COMMUNE.shp")  # Layer IGN
 
@@ -100,21 +99,11 @@ geo_df_commune = geo_df.sjoin(df_communes,how='left')
 geo_df_commune = geo_df_commune.drop(columns=['index_right']) #drop the column to do the jointure
 geo_df_chef_lieu = geo_df_commune.merge(df_cheflieu,left_on='ID', right_on='ID_COM') # attributaire join with the id of the cheflieu
 geo_df_chef_lieu = geo_df_chef_lieu.rename(columns ={'geometry_x':'intineraire','geometry_y':'cheflieu'})
-row= geo_df_chef_lieu.iloc[[1]] # test with one delivery
-row_itineraire = row # we store to plot the initial delivery
-row_itineraire= gpd.GeoDataFrame(row_itineraire,geometry='intineraire') # we transform it to a line
-row= gpd.GeoDataFrame(row,geometry='cheflieu') # we get the center of the cheflieu as a geometry 
-row['buffer'] = row.geometry.buffer(100000) # create the buffer based on the cheflieu point
-row = row.drop(columns=['ID_COM','ID']) #drop the column to do the jointure
-row = gpd.GeoDataFrame(row,geometry='buffer') # we set the buffer as the gdf geometry
-geo_df_commune['linestring'] = geo_df_commune['geometry']# backup of linestring to preserve for the jointure
-geo_df_commune = gpd.GeoDataFrame(geo_df_commune,geometry='geometry')#we set the line as a geometry
-row = row.sjoin(geo_df_commune,predicate='contains', how='inner') # we join with lines from the simulations from before the manipulation
-row = row[row['id_utilisateur_right']!=row['id_utilisateur_left']] # filter the users with the same ID
-row_lines = gpd.GeoDataFrame(row,geometry='linestring')
-m = row_itineraire.explore(name = 'livraison',style_kwds=dict(fill=False, stroke=True,weight=5,color='black'))
-m = row.explore(m=m, name="Buffer", style_kwds=dict(fill=False, stroke=True,color='black'))
-m = row_lines.explore(m=m, cmap = 'Paired', column='id_simulation_right', categorical=True)
 
-output= root +"/data/raw/" +  "simulation.html"
-m.save(output)
+
+
+
+# le dataframe geo_df_chef_lieu est à enregistrer sous format csv
+# ajouter la condition de type_simulation (2 fichiers csv différents à créer)
+# ajouter le filtre de la France
+
