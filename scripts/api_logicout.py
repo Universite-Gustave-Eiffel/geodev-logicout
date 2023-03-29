@@ -24,7 +24,7 @@ def calcul_couts(traj):
         'service': 'mapbox',
         'retour': False,
         'etapes': etapes,
-        "itineraire_key": "sk.eyJ1IjoiY2xvdmlzLWJlcmdlcmV0IiwiYSI6ImNsZjlvc3d1NTJpdXQzb3Iwb2tiaHI0dGQifQ.jm8UsolExu9Keim4UEgybA"
+        "itineraire_key": "sk.eyJ1IjoiY2xvdmlzLWJlcmdlcmV0IiwiYSI6ImNsZnRlMGUyOTAwMDIzZm9hcWs2ZHdraTQifQ.F1gVE8c5d8Xn_47QYgQ2QA"
     }
 
     data = json.dumps(json_logicout)
