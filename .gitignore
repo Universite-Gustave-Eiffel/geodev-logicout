@@ -1,7 +1,7 @@
 # hide raw data from git
 data/raw/*.csv
 data/raw/*.xls
-
+data/raw/*.html
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
