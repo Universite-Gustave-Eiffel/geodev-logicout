@@ -7,6 +7,8 @@ link = ''
 data = np.genfromtxt(link, delimiter=',')
 
 # Appel algo rayon 100km
+A = []
+
 
 
 plt.hist(A,bins=20,range=(0,4),color="y",edgecolor="gray",label="histogramme")
