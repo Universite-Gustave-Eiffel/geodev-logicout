@@ -1,0 +1,4 @@
+#Mutualisation calculation settings: :
+rayon: 100 #In km
+tuple: 2 #Number of maximum producers by mutualisation
+url : 'https://wikipedia.com' #Complementary data
