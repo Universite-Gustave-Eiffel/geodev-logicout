@@ -2,6 +2,7 @@
 data/raw/*.csv
 data/raw/*.xls
 data/raw/*.html
+data/raw/*.txt
 
 # ignore MacOS files
 .DS_Store
