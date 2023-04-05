@@ -21,9 +21,12 @@ They are not open for confidentiality reasons but you can contact the [SPLOTT la
 ... The dependencies of the project are on the file requirements.txt/yml
 
 ## Prepare the data
-Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations
-Those  files will be stored at  /data/raw/
+Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored at  /data/raw/).
+
+This script will take as input the files .csv from logicout's database and make spatial and attributaires joins between tables to filter the data by entry, user and localization. 
+
 For the purpose of this study we will only use the file _simulations_reel_gdf.csv , that contains the selected data of 1096 simulations made in the Logicout application.
+
 
 # Licence 
 
