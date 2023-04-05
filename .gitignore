@@ -2,6 +2,7 @@
 data/raw/*.csv
 data/raw/*.xls
 data/raw/*.html
+data/raw/*.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
