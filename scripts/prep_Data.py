@@ -6,9 +6,6 @@ from shapely.geometry import Point, LineString, shape
 
 # Script to create the CSV of the filtered and joined dataframes
 # Execute once to generate the csv files inside the folder "data/raw"
-#
-#
-
 
 
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory

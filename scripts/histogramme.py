@@ -40,11 +40,25 @@ def IsIn(gdf, dist):
         cheflieu = cheflieu.drop(columns=['ID_COM']) # drop the column to do the jointure
         cheflieu = gpd.GeoDataFrame(cheflieu, geometry='buffer') # we set the buffer as the gdf geometry
 
-        gdf['linestring'] = gdf['geometry'] # backup of linestring to preserve for the jointure
-        gdf = gpd.GeoDataFrame(gdf, geometry='geometry') #we set the line as a geometry
+        geometry_iti = gdf['itineraire'].map(wkt.loads)
+        gdf2 = gpd.GeoDataFrame(gdf, geometry=geometry_iti, crs = 'EPSG:2154') #we set the line as a geometry
 
-        IsMutu = cheflieu.sjoin(gdf, predicate='contains', how='inner') # we join with lines from the simulations from before the manipulation
+        IsMutu = cheflieu.sjoin(gdf2, predicate='contains', how='inner') # we join with lines from the simulations from before the manipulation
         IsMutu = IsMutu[IsMutu['id_utilisateur_right']!=IsMutu['id_utilisateur_left']] # filter the users with the same ID
+
+        # Affichage graphique pour certaines valeurs
+        if i % 500 == 0:
+            root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
+            row_itineraire = gpd.GeoDataFrame(tournee, geometry=geometry_iti, crs = 'EPSG:2154')
+            m = row_itineraire.explore(name = 'livraison',style_kwds=dict(fill=False, stroke=True,weight=5,color='black'))
+            
+            m = cheflieu.explore(m=m, name="Buffer", style_kwds=dict(fill=False, stroke=True,color='black'))
+            
+            row_lines = gpd.GeoDataFrame(IsMutu, geometry=geometry_iti, crs = 'EPSG:2154')
+            m = row_lines.explore(m=m, cmap = 'Paired', column='id_simulation_right', categorical=True)
+
+            output = root+"/data/raw/"+str(i)+"_simulation.html"
+            m.save(output)
 
         nbrMutu = IsMutu.count()[0]
 
@@ -54,7 +68,7 @@ def IsIn(gdf, dist):
 
 
 def histo(data, filename, dist):
-    plt.hist(data,bins=10,color="blue",edgecolor="gray",label="histogramme") # 10 class histogram
+    plt.hist(data,bins=20,color="blue",edgecolor="gray",label="histogramme") # 10 class histogram
     plt.title('Histogramme du nombre de mutualisations possibles :'+filename)
     plt.xlabel('Nombre de producteurs dans un rayon de '+str(dist*1e-3)+' km')
     plt.ylabel('Fréquence')
@@ -67,8 +81,8 @@ if __name__ == "__main__":
     filename = "simulations_reel_gdf.csv"
 
     gdf = create_df(filename) # dataframe du fichier csv choisi
-    dist = 100000
+    dist = 50000
     data = IsIn(gdf, dist)
-
-    histo(data, filename, dist)
+    print(gdf)
+    # histo(data, filename, dist)
 
