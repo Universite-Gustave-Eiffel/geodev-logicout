@@ -32,13 +32,14 @@ def itineraire(traj):
     poly_test = polyline.encode(polyline_str)
     distance = response["resourceSets"][0]["resources"][0]["travelDistance"]
     duration = response["resourceSets"][0]["resources"][0]["travelDuration"]
+    route = response["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"]
     
     #Displaying itinerary infos
     print(f"Distance : {distance} km")
     print(f"Durée : {duration} secondes")
     print(polyline_str)
     print(polyline_coord)
-    for step in polyline_str:
-        print(step['instructions'])
+    for step in route:
+        print(step['instruction'])
 test = ["48.8566,2.3522" , "51.5074,-0.1278" , "46.5468,1.6639"]
 itineraire(test)         
