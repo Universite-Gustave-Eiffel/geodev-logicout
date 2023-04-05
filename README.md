@@ -16,6 +16,15 @@ They are not open for confidentiality reasons but you can contact the [SPLOTT la
 - trajet.csv : trips between two stops
 - usage.csv : metadata on the platform usage (for data quality control)
 
+# Instructions
+## Preparation of the environement
+... The dependencies of the project are on the file requirements.txt/yml
+
+## Prepare the data
+Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations
+Those  files will be stored at  /data/raw/
+For the purpose of this study we will only use the file _simulations_reel_gdf.csv , that contains the selected data of 1096 simulations made in the Logicout application.
+
 # Licence 
 
 This work is licensed under an 
