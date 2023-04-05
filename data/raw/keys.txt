@@ -1,4 +1,0 @@
-Mapbox:sk.eyJ1IjoiY2xvdmlzLWJlcmdlcmV0IiwiYSI6ImNsZjlvc3d1NTJpdXQzb3Iwb2tiaHI0dGQifQ.jm8UsolExu9Keim4UEgybA
-GMaps:
-BMaps:AsY_3uLWFITVnxJzQMAExgrZQ4zTdMEOha9jDKCKYNEsQdHyxMO-SeTHdvzTgCax
-Logicout:fb885e9a-50a6-4bc3-9a67-0c1560eb2927
