@@ -1,12 +1,13 @@
 import json
 import requests
+from dotenv import load_dotenv
+import os
 
-with open('data/raw/keys.txt') as f:
-    lines = f.readlines()
-
-logicout_key = lines[3][9:]
-mapbox_key = lines[0][7:]
-google_key =lines[1][6:]
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
+logicout_key = os.getenv('LOGICOUT_KEY')
+gmaps_key = os.getenv('GMAPS_KEY')
+mapbox_key = os.getenv('MAPBOX_SECRET_KEY')
 
 def calcul_couts(traj):
     '''

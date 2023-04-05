@@ -1,10 +1,11 @@
 import requests
 import polyline
+from dotenv import load_dotenv
+import os
 
-with open('data/raw/keys.txt') as f:
-    lines = f.readlines()
-    
-api_key = lines[2][6:]
+dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
+api_key = os.getenv('BMAPS_KEY')
 ##################################################################################
 
 def itineraire(traj):
