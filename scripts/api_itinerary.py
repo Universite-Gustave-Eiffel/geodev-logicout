@@ -1,8 +1,10 @@
 import requests
 import polyline
 
-api_key = "AsY_3uLWFITVnxJzQMAExgrZQ4zTdMEOha9jDKCKYNEsQdHyxMO-SeTHdvzTgCax"
-
+with open('data/raw/keys.txt') as f:
+    lines = f.readlines()
+    
+api_key = lines[2][6:]
 ##################################################################################
 
 def itineraire(traj):
