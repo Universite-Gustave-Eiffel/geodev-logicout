@@ -2,6 +2,10 @@
 data/raw/*.csv
 data/raw/*.xls
 data/raw/*.html
+
+# ignore MacOS files
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
