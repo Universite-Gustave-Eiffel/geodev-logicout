@@ -21,6 +21,18 @@ To use the API present in the code, you will need:
 - A logicout API key
 - A Google Maps or Mapbox API key
 
+You will need to put these keys in a .env file at the root of the repo, formatted as follows :
+
+``` env
+LOGICOUT_KEY='my_key'
+GMAPS_KEY='my_key'
+```
+or
+``` env
+LOGICOUT_KEY='my_key'
+MAPBOX_KEY='my_key'
+```
+
 # Instructions
 ## Preparation of the environement
 ... The dependencies of the project are on the file requirements.txt/yml
