@@ -1,6 +1,12 @@
 import json
 import requests
 
+with open('data/raw/keys.txt') as f:
+    lines = f.readlines()
+
+logicout_key = lines[3][9:]
+mapbox_key = lines[0][7:]
+google_key =lines[1][6:]
 
 def calcul_couts(traj):
     '''
@@ -13,7 +19,7 @@ def calcul_couts(traj):
         etapes.append( {"longitude": point[0], "latitude": point[1], "duree_livraison": "00:10:00"})
     print(etapes)
     json_logicout = {
-        'key': 'fb885e9a-50a6-4bc3-9a67-0c1560eb2927',
+        'key': logicout_key,
         'id_vehicule': 'VUL_12',
         'type_vul': 'GF',
         'frigorifique': True,
@@ -24,7 +30,7 @@ def calcul_couts(traj):
         'service': 'mapbox',
         'retour': False,
         'etapes': etapes,
-        "itineraire_key": "sk.eyJ1IjoiY2xvdmlzLWJlcmdlcmV0IiwiYSI6ImNsZnRlMGUyOTAwMDIzZm9hcWs2ZHdraTQifQ.F1gVE8c5d8Xn_47QYgQ2QA"
+        "itineraire_key": mapbox_key
     }
 
     data = json.dumps(json_logicout)
