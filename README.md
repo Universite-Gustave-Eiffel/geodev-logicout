@@ -16,6 +16,11 @@ They are not open for confidentiality reasons but you can contact the [SPLOTT la
 - trajet.csv : trips between two stops
 - usage.csv : metadata on the platform usage (for data quality control)
 
+To use the API present in the code, you will need:
+
+- A logicout API key
+- A Google Maps or Mapbox API key
+
 # Instructions
 ## Preparation of the environement
 ... The dependencies of the project are on the file requirements.txt/yml
