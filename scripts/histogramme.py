@@ -1,14 +1,10 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import os
 import geopandas as gpd
 import pandas as pd
 import shapely
 from shapely.geometry import Point, LineString, shape
-import folium
-from shapely import wkt
-
-
+import matplotlib as plt
+import numpy as np
 
 
 def create_df(filename) :
