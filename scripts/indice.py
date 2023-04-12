@@ -62,6 +62,10 @@ def indice(A, B, dist):
     # pointsB = gpd.GeoDataFrame(geometry=gpd.points_from_xy(B[:,0], B[:,1]))
     
     # Calcule la distance entre les points les plus éloignés entre les deux GeoDataFrames
+    """
+    Attention : à verifier si la distance est faite entre les points du coupleA et ceux du coupleB 2 à 2, ou alors 
+    c'est le max entre tous les points du coupleA et tous les points du coupleB
+    """
     max_distance = pointsA.distance(pointsB).max()
     
     ind = dist_start * max_distance / aire
