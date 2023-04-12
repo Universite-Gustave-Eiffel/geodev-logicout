@@ -35,14 +35,14 @@ MAPBOX_KEY='my_key'
 
 # Instructions
 ## Preparation of the environement
-... The dependencies of the project are on the file 'requirements.txt/yml'
+... The dependencies of the project are on the file `requirements.txt/yml`
 
 ## Prepare the data
-Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored in the  'data/raw' folder).
+Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored in the  `data/raw` folder).
 
 This script will take as input the files .csv from logicout's database and make spatial and attributaires joins between tables to filter the data by entry, user and localization. 
 
-For the purpose of this study we will only use the file 'simulations_reel_gdf.csv' , that contains the selected data of 1096 simulations made in the Logicout application.
+For the purpose of this study we will only use the file `simulations_reel_gdf.csv` , that contains the selected data of 1096 simulations made in the Logicout application.
 
 
 # Licence 
