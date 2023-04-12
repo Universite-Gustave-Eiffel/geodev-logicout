@@ -21,7 +21,7 @@ To use the API present in the code, you will need:
 - A logicout API key
 - A Google Maps or Mapbox API key
 
-You will need to put these keys in a .env file at the root of the repo, formatted as follows :
+You will need to put these keys in a `.env` file at the root of the repo, formatted as follows :
 
 ``` env
 LOGICOUT_KEY='my_key'
