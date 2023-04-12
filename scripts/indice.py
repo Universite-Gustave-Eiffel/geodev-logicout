@@ -35,7 +35,7 @@ def create_df(filename) :
 # coupleA = [Xa,Ya]
 # coupleB = [Xb,Yb]
 def distance(coupleA,coupleB):
-    dist = np.sqrt((coupleA[0]-coupleB[0])**2 + (coupleA[1]-coupleB[1])**2)
+    dist = np.sqrt((float(coupleA[0])-float(coupleB[0]))**2 + (float(coupleA[1])-float(coupleB[1]))**2)
 
 
 # Fonction qui renvoie l'indice créé entre 2 tournée A et B, en fonction de la distance du buffer choisie
@@ -76,13 +76,11 @@ def indice(A, B, dist):
 if __name__ == "__main__":
 
 
-    geo_df_envelop= create_df('simulations_reel_gdf.csv')
+    gdf= create_df('simulations_reel_gdf.csv')
 
-    print(geo_df_envelop.crs)
+    #print(gdf)
     
-    # gdf = simulation_reel_csv("simulations_reel_gdf.csv")
-    # filename = "simulations_reel_gdf.csv"
-    # gdf = create_df(filename)
-    # A = gdf.iloc[0]
-    # B = gdf.iloc[1]
-    # ind = indice(A,B,100)
+    A = gdf.iloc[0]
+    B = gdf.iloc[1]
+    ind = indice(A,B,100)
+    print(ind)
