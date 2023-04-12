@@ -1,0 +1,9 @@
+The shapefiles "COMMUNE", "REGION" and "CHEFLIEU_COMMUNE" were downloaded at https://geoservices.ign.fr/adminexpress
+
+(https://wxs.ign.fr/x02uy2aiwjo9bm8ce5plwqmr/telechargement/prepackage/A (DMINEXPRESS_SHP_TERRITOIRES_PACK_2023-03-20$ADMIN-EXPRESS_3-1__SHP_LAMB93_FXX_2023-03-20/file/ADMIN-EXPRESS_3-1__SHP_LAMB93_FXX_2023-03-20.7z)
+
+Only their their geometry and "id" field were used.
+
+The "COMMUNE"'s geometries were simplified with the algorithm DOUGLAS-PEUCKER in order to reduce computing time.
+
+The shapefile "FRANCE" was created from the file "COMMUNE".
