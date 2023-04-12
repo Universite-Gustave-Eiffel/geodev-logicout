@@ -8,7 +8,11 @@ import numpy as np
 import use_data
 
 
+
 def IsIn_tournee_gdf(tournee, gdf, dist):
+    """
+        Retourne un d
+    """
 
     geometry = tournee['cheflieu'].map(wkt.loads)
     cheflieu = gpd.GeoDataFrame(tournee, geometry=geometry, crs = 'EPSG:2154') # we get the center of the cheflieu as a geometry
@@ -27,6 +31,7 @@ def IsIn_tournee_gdf(tournee, gdf, dist):
     return gdf_IsInclude
 
 
+# permet de faire la validation du rayon inverse mais ne fonctionne pas pour l'instant
 
 def IsIn_tournee_tournee(tourneeA, tourneeB, dist):
     """
@@ -37,37 +42,40 @@ def IsIn_tournee_tournee(tourneeA, tourneeB, dist):
         path_trajet (string): name of file in the directory ../data/raw
 
     """
-    IsIn = False
-
     # definition of the tour geometry A : 'itineraire'
     geometryA = tourneeA['itineraire'].map(wkt.loads)
     tourneeA = gpd.GeoDataFrame(tourneeA, geometry=geometryA, crs = 'EPSG:2154')
 
-    # definition of the tour geometry A : 'itineraire'
+    # definition of the tour geometry B : 'chef-lieu'
     geometryB = tourneeB['cheflieu_right'].map(wkt.loads)
     tourneeB = gpd.GeoDataFrame(tourneeB, geometry=geometryB, crs = 'EPSG:2154')
     tourneeB['buffer'] = tourneeB.geometry.buffer(dist)
+    tourneeB = gpd.GeoDataFrame(tourneeB, geometry='buffer', crs = 'EPSG:2154')
 
     gdf_IsInclude = tourneeB.sjoin(tourneeA, predicate='contains', how='inner')
 
     return gdf_IsInclude.count()[0]
 
 
+    
 
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
     gdf = use_data.create_gdf(filename) # dataframe du fichier csv choisi
-    tournee = gdf.iloc[[0]]
+    tournee = gdf.iloc[[290]]
     dist = 100000
     test = IsIn_tournee_gdf(tournee, gdf, dist)
 
+    tourneeB = test[test['id_utilisateur_right']==194]
 
-    tourneeA = gdf.iloc[[0]]
-    n = test.count()[0]
-    for i in range(n):
-        tourneeB = test.iloc[[i]]
-        print(IsIn_tournee_tournee(tourneeA, tourneeB, dist))
+    print(IsIn_tournee_tournee(tournee, tourneeB, dist))
+    # n = test.count()[0]
+    # for i in range(n):
+    #     tourneeB = test.iloc[[i]]
+    #     print(IsIn_tournee_tournee(tournee, tourneeB, dist))
+
+
 
 
 
