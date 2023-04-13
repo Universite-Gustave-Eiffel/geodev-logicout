@@ -3,6 +3,7 @@ import pandas as pd
 from shapely import wkt
 from shapely.geometry import Point, LineString, shape
 import use_data
+import IsInclude
 
 
 
@@ -15,14 +16,14 @@ This module has a function that, for a specific row of a Geopandas's dataframe, 
 
 #we take the database and a row as example
 geo_df= use_data.create_gdf('_simulations_reel_gdf.csv')
-row_sample = geo_df.iloc[[2]]
+row_sample = geo_df.iloc[[3]]
 
 
 
 
 def jacaard_index(row,geodataframe):
     #call the function to generate the talbe of itineraires that are mutualisables
-    geo_df_envelop = use_data.mutualisables(row,geodataframe)
+    geo_df_envelop = IsInclude.IsIn_tournee_gdf(row,geodataframe,100000)
 
 
 
@@ -56,3 +57,8 @@ def jacaard_index(row,geodataframe):
 
 
 
+
+
+jacaard= jacaard_index(row_sample,geo_df)
+
+print(jacaard)
