@@ -18,7 +18,7 @@ def calcul_couts(traj):
     #Parsing the coordinates array to build the json
     etapes = []
     for point in traj:
-        etapes.append( {"longitude": point[0], "latitude": point[1], "duree_livraison": "00:10:00"})
+        etapes.append( {"latitude": point[0], "longitude": point[1], "duree_livraison": "00:10:00"})
     print(etapes)
     #Building the json used for the request
     json_logicout = {
@@ -26,8 +26,6 @@ def calcul_couts(traj):
         'id_vehicule': 'VUL_12',
         'type_vul': 'GF',
         'frigorifique': True,
-        'duree_conduite': '01:00:00',
-        'duree_livraison': '00:30:00',
         'duree_autres_activites': '01:30:00',
         'heure_depart': '15/03/2025 15:48',
         'service': 'mapbox',
@@ -48,5 +46,5 @@ def calcul_couts(traj):
     print(json_response)
     
         
-test = [(48.8566,2.3522) , (1.5074,-0.1278) , (46.5468,1.6639)]
+test = [(48.8566,2.3522), (46.5468,1.6639)]
 calcul_couts(test)
