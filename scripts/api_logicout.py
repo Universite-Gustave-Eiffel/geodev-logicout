@@ -2,7 +2,12 @@ import json
 import requests
 from dotenv import load_dotenv
 import os
+import logging
+from datetime import date
 
+#Setting up the logfile to keep track of the requests
+logging.basicConfig(filename='log.txt', level=logging.INFO)
+#Retrieving the keys from the .env file
 dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 load_dotenv(dotenv_path)
 logicout_key = os.getenv('LOGICOUT_KEY')
@@ -43,7 +48,8 @@ def calcul_couts(traj):
     )
     json_response = r.json()
     #Printing
-    print(json_response)
+    #print(json_response)
+    logging.info(str(date.today())+str(json_response))
     
         
 test = [(48.8566,2.3522), (46.5468,1.6639)]
