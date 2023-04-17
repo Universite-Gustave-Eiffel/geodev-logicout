@@ -10,33 +10,28 @@ from shapely import wkt
 import use_data 
 
 
-
-# Fonction qui renvoie la distance euclidienne entre 2 couples de points, définis de cette manière : 
-# coupleA = [Xa,Ya]
-# coupleB = [Xb,Yb]
-def distance(coupleA,coupleB):
-    dist = np.sqrt((float(coupleA[0])-float(coupleB[0]))**2 + (float(coupleA[1])-float(coupleB[1]))**2)
-
-
 # Fonction qui renvoie l'indice créé entre 2 tournée A et B, en fonction de la distance du buffer choisie
-def indice(A, B, dist):
-
-    aire = dist**2
- 
-    A_df = gpd.GeoDataFrame(A, geometry=A['geometry'], crs = 'EPSG:2154')
-    B_df = gpd.GeoDataFrame(B, geometry=B['geometry'].map(wkt.loads), crs = 'EPSG:2154')
-
-    startA = [A_df['start'],A_df['start']]
-    startB = [B_df['start'],B_df['start']]
-
-    dist_start = distance(startA,startB)
+def dist_start(A, B):
     
+    startA = [A['geometry'].x.values[0],A['geometry'].y.values[0]]
+    startB = [B['geometry'].x.values[0],B['geometry'].y.values[0]]
+
+    dist_start = np.sqrt((startA[0] - startB[0])**2 + (startA[1] - startB[1])**2)
+
+    return dist_start
+
+
+def indice(A,B,dist_start,dist):
+
+    # Calcul de la distance (100km) au carré
+    aire = dist**2
+
     # Récupération de la liste des points de A
-    pointsA = A_df['itineaire']
+    pointsA = A['geometry']
     # pointsA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(A[:,0], A[:,1]))
     
     # Récupération de la liste des points de B
-    pointsB = B_df['itineaire']
+    pointsB = B['geometry']
     # pointsB = gpd.GeoDataFrame(geometry=gpd.points_from_xy(B[:,0], B[:,1]))
     
     # Calcule la distance entre les points les plus éloignés entre les deux GeoDataFrames
@@ -47,28 +42,34 @@ def indice(A, B, dist):
     """
     max_distance = pointsA.distance(pointsB).max()
     # A récupérer : l'indice des points A et B pour savoir entre quels points la distance est max
-
+    print(max_distance)
     ind = dist_start * max_distance / aire
-
+    
     return ind
 
 
 if __name__ == "__main__":
 
     gdf= use_data.create_gdf('simulations_reel_gdf.csv')
-    # gdf = gpd.GeoDataFrame(gdf, geometry=gdf['start'].map(wkt.loads),crs = 'EPSG:2154')
 
-    A = gdf.iloc[0]
-    geometryA = A['cheflieu'].map(wkt.loads)
-    A = gpd.GeoDataFrame(A, geometry=geometryA, crs = 'EPSG:2154')
-    B = gdf.iloc[1]
+    # Changement de la géométrie vers start
+    gdf = gpd.GeoDataFrame(gdf, geometry=gdf['start'].map(wkt.loads),crs = 'EPSG:2154')
 
-    print(type(A['start']))
-    print('---------------------')
-    print(A)
-    print('---------------------')
+    # Récupération de 2 éléments
+    A = gdf.iloc[[0]]
+    B = gdf.iloc[[1]]
 
-    
+    # Calcul de la distance entre les 2 points de départ
+    dist_start = dist_start(A, B)
 
-    ind = indice(A,B,100)
+    # Changement de la géométrie vers itineraire
+    gdf = gpd.GeoDataFrame(gdf, geometry=gdf['itineraire'].map(wkt.loads),crs = 'EPSG:2154')
+
+    # Récupération de 2 éléments
+    A = gdf.iloc[[0]]
+    B = gdf.iloc[[1]]
+
+    # Calcul de l'indice
+    ind = indice(A,B,dist_start,100)
+
     print(ind)
