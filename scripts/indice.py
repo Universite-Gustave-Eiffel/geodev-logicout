@@ -43,8 +43,8 @@ def indice(A, B, dist):
 
     aire = dist**2
 
-    startA = A['start']
-    startB = B['start']
+    startA = pd.A['start']
+    startB = pd.B['start']
     
     # startA = A['itineraire'].apply(lambda x: Point(x.coords[0]))
     # startB = B['itineraire'].apply(lambda x: Point(x.coords[0]))
@@ -67,7 +67,8 @@ def indice(A, B, dist):
     c'est le max entre tous les points du coupleA et tous les points du coupleB
     """
     max_distance = pointsA.distance(pointsB).max()
-    
+    # A récupérer : l'indice des points A et B pour savoir entre quels points la distance est max
+
     ind = dist_start * max_distance / aire
 
     return ind
@@ -78,7 +79,7 @@ if __name__ == "__main__":
 
     gdf= create_df('simulations_reel_gdf.csv')
 
-    #print(gdf)
+    # print(geo_df_envelop.crs)
     
     A = gdf.iloc[0]
     B = gdf.iloc[1]
