@@ -4,7 +4,7 @@ import pandas as pd
 from shapely import wkt
 
 
-def create_gdf(filename) :
+def create_gdf(filename,'cheflieu') :
     """
     Create geodataframes from the real simulation files
     Args:
@@ -40,5 +40,5 @@ def create_gdf(filename) :
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
-    gdf = create_gdf(filename) # dataframe du fichier csv choisi
+    gdf = create_gdf(filename,'cheflieu') # dataframe du fichier csv choisi
     print(gdf)

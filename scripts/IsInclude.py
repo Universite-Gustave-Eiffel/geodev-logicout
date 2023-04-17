@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # Example of the use of this function
 
     filename = "simulations_reel_gdf.csv"
-    gdf = use_data.create_gdf(filename) # dataframe du fichier csv choisi
+    gdf = use_data.create_gdf(filename,'cheflieu') # dataframe du fichier csv choisi
     dist = 100000
 
     tournee = gdf.iloc[[1]]
