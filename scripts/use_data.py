@@ -2,7 +2,7 @@ import os
 import geopandas as gpd
 import pandas as pd
 from shapely import wkt
-pd.options.mode.chained_assignment = None  # to avoid warnings
+
 
 def create_gdf(filename) :
     """
