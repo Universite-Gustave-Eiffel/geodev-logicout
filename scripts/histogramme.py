@@ -29,8 +29,7 @@ def histo(filename, dictFilename, dist, type, dictType):
 
 
 if __name__ == "__main__":
-    # filename = ["simulations_reel_gdf.csv", "simulations_gdf.csv"]
-    filename = ["simulations_gdf.csv"]
+    filename = ["simulations_reel_gdf.csv", "simulations_gdf.csv"]
     dictFilename = {"simulations_reel_gdf.csv": "reelles", "simulations_gdf.csv": "quelconques"}
     dist = [50e3, 100e3, 150e3]
     typeIsIn = [1, 2]
