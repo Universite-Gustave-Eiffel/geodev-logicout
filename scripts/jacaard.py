@@ -24,9 +24,10 @@ def jacaard_index(row,geodataframe,dist,buffer_convex_hull,type):
     Args:
         row {geopandas Geodataframe line}: a row of an geodataframe
         geodataframe {geopandas Geodataframe}: name of file in the directory ../data/raw
-        dist {int}: buffer size in meters´
-        buffer_enveloppe {int}: size of the buffer applied to the lines before generating the convex hull
-        buffer_enveloppe {int}: size of the buffer applied to the lines before generating the convex hull
+        radius {int}: buffer size in meters´
+        dist {int}: buffer size in meters
+        buffer_hull {int}: size of the buffer applied to the lines before generating the convex hull
+        type {int}: 1 => single buffer inclusion | 2 => double buffer inclusion
     """    
     #call the function to generate the talbe of itineraires that are mutualisables
     geo_df_envelop = IsInclude.IsIn_tournee_gdf(row,geodataframe,dist,type)
