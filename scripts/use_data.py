@@ -2,9 +2,10 @@ import os
 import geopandas as gpd
 import pandas as pd
 from shapely import wkt
+from shapely.geometry import Point, LineString, shape
 
 
-def create_gdf(filename) :
+def create_gdf(filename, ColumnGeometry) :
     """
     Create geodataframes from the real simulation files
 
@@ -15,10 +16,31 @@ def create_gdf(filename) :
     root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
     dirname = "/data/raw/" # relative path to the gitignore directory - the function on the file _dataframes_gpd.py is adapted to find the relative path of this directory
     df = pd.read_csv(root +dirname+ filename,sep=';')
-    geometry = df['cheflieu'].map(wkt.loads)
+    geometry = df[ColumnGeometry].map(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs = 'EPSG:2154')
     return gdf
 
+
+def line_to_points(line):
+    """
+    Découpe de la linestring en liste de points
+    """
+    return [Point(xy) for xy in line.coords]
+
+
+def line_to_coord(linestring):
+    """
+    Récupère les coordonnées des points de la linestring, et les ajoutent dans un array qu'il retourne en sortie
+    """
+    C = []
+    list_points = linestring.apply(line_to_points).explode()
+    for point in list_points:
+        x = point.x
+        y = point.y
+        C.append([point.x,point.y])
+
+    return C    
+             
 
 # def affichage():
 #     # Affichage graphique pour certaines valeurs
@@ -36,11 +58,14 @@ def create_gdf(filename) :
 #         m.save(output)
 
 
-
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
-    gdf = create_gdf(filename) # dataframe du fichier csv choisi
+    gdf = create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     print(gdf)
-
-
+    
+    # Test
+    gdf = gpd.GeoDataFrame(gdf, geometry=gdf['itineraire'].map(wkt.loads),crs = 'EPSG:2154')
+    A = gdf.iloc[[0]]
+    linestring = A['geometry']
+    print(line_to_coord(linestring))
