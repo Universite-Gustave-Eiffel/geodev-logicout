@@ -1,18 +1,19 @@
-import os
 import geopandas as gpd
 import pandas as pd
-import shapely
 from shapely.geometry import Point, LineString, shape
 import matplotlib as plt
 import numpy as np
-import folium
 from shapely import wkt
 import use_data 
 
 
-# Fonction qui renvoie l'indice créé entre 2 tournée A et B, en fonction de la distance du buffer choisie
 def dist_start(A, B):
-    
+    """ 
+    Cette fonction permet de calculer la distance entre les points de départ des tournées A et B
+    Input : A, B (geodataframe) : geodataframe des 2 tournées A et B
+    Output : dist_start (numpy.float64) : distance entre les 2 points de départ des tournées A et B.
+    """
+
     startA = [A['geometry'].x.values[0],A['geometry'].y.values[0]]
     startB = [B['geometry'].x.values[0],B['geometry'].y.values[0]]
 
@@ -22,73 +23,70 @@ def dist_start(A, B):
 
 
 def indice(A,B,dist_start,dist):
+    """ 
+    Cette fonction permet de calculer l'indice des distances pour l'algorithme de mutualisation
+    Input : A, B (geodataframe) : geodataframe des 2 tournées A et B
+            dist_start (numpy.float64) : distance entre les 2 points de départs des 2 tournées A et B en mètres
+            dist (float) : distance en mètres du rayon du buffer
+    Output : indice (numpy.float64) : l'indice des distances
+    """
 
     # Calcul de la distance (100km) au carré
     aire = np.pi*dist**2
 
     # Récupération de la liste des points de A
     linestringA = A['geometry']
-    # pointsA = gpd.GeoDataFrame(geometry=gpd.points_from_xy(A[:,0], A[:,1]))
     
     # Récupération de la liste des points de B
     linestringB = B['geometry']
-    # pointsB = gpd.GeoDataFrame(geometry=gpd.points_from_xy(B[:,0], B[:,1]))
     
+    # On découpe le linestring en plusieurs points
+    pointsA = linestringA.apply(use_data.line_to_points).explode()
+    pointsB = linestringB.apply(use_data.line_to_points).explode()
+
+    print('--------------------')
+    print('Points de A : ')
+    print(pointsA)
+    print('--------------------')
+    print('Points de B : ')
+    print(pointsB)
+
     # Calcule la distance entre les points les plus éloignés entre les deux GeoDataFrames
     """
     Attention : à verifier si la distance est faite entre les points du coupleA et ceux du coupleB 2 à 2, ou alors 
     c'est le max entre tous les points du coupleA et tous les points du coupleB
     --> Réponse : ok, distance entre tous les points
     """
-    print('--------------------')
-    print('Points de A : ')
-    print(linestringA)
-    print('--------------------')
-    print('Points de B : ')
-    print(linestringB)
-    print('--------------------')
-    
-    # Découpe de la linestring en liste de points
-    def line_to_points(line):
-        return [Point(xy) for xy in line.coords]
-
-    # Appliquer la fonction à chaque ligne de la GeoSeries
-    pointsA = linestringA.apply(line_to_points).explode()
-    pointsB = linestringB.apply(line_to_points).explode()
-    
-    max_distance = 0
+    C = []
     for p1 in pointsA:
         for p2 in pointsB:
             dist = p1.distance(p2)
-            if(dist>max_distance):
-                max_distance = dist
+            C.append(dist)
 
-    print('--------------------')
-    print("Dist_start : ")
-    print(dist_start)
-    print("max_distance : ")
-    print(max_distance)
-    print("aire : ")
-    print(aire)
-    print('--------------------')
+    # On récupère la distance la plus grande dans le tableau
+    max_distance = max(C)
     
-   
-    # Récupération du maximum des distances
-    
-    # max_distance = distance_entre_points.max()
+    print('--------------------')
+    print("dist_start : ",dist_start)
+    print("max_distance : ",max_distance)
+    print("aire : ",aire)
+    print('--------------------')
 
-    # Indice calculé
+    # On calcule l'indice avec la formule suivante :
     ind = dist_start * max_distance / aire
-    
+
     return ind
+
+
 
 
 if __name__ == "__main__":
 
     # gdf= use_data.create_gdf('simulations_reel_gdf.csv')
 
+    # Numéro des lignes des 2 tournées choisies dans le geodataframe
     pos1 = 821
-    pos2 = 57
+    pos2 = 58
 
     # Changement de la géométrie vers start
     gdf1 = use_data.create_gdf('simulations_reel_gdf.csv', 'start')
