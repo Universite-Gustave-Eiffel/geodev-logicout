@@ -3,8 +3,10 @@ import geopandas as gpd
 import pandas as pd
 from shapely import wkt
 
+from shapely.geometry import Point, LineString, shape
 
-def create_gdf(filename, ColumnsGeometry) :
+
+def create_gdf(filename, ColumnGeometry) :
     """
     Create geodataframes from the real simulation files
 
@@ -20,6 +22,27 @@ def create_gdf(filename, ColumnsGeometry) :
     return gdf
 
 
+
+def line_to_points(line):
+    """
+    Découpe de la linestring en liste de points
+    """
+    return [Point(xy) for xy in line.coords]
+
+
+def line_to_coord(linestring):
+    """
+    Récupère les coordonnées des points de la linestring, et les ajoutent dans un array qu'il retourne en sortie
+    """
+    C = []
+    list_points = linestring.apply(line_to_points).explode()
+    for point in list_points:
+        x = point.x
+        y = point.y
+        C.append([point.x,point.y])
+
+    return C    
+             
 # def affichage():
 #     # Affichage graphique pour certaines valeurs
 #     if i % 500 == 0:
@@ -35,12 +58,15 @@ def create_gdf(filename, ColumnsGeometry) :
 #         output = root+"/data/raw/"+str(i)+"_simulation.html"
 #         m.save(output)
 
-
-
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
     gdf = create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     print(gdf)
-
+    
+    # Test
+    gdf = gpd.GeoDataFrame(gdf, geometry=gdf['itineraire'].map(wkt.loads),crs = 'EPSG:2154')
+    A = gdf.iloc[[0]]
+    linestring = A['geometry']
+    print(line_to_coord(linestring))
 
