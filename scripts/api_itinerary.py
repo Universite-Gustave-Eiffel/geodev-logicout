@@ -1,5 +1,4 @@
 import requests
-import polyline
 from dotenv import load_dotenv
 import os
 
@@ -28,8 +27,6 @@ def itineraire(traj):
     #Gathering itinerary infos
     polyline_str = response["resourceSets"][0]["resources"][0]["routePath"]["line"]["coordinates"]
     polyline_coord = [(lat, lon) for lon, lat in polyline_str]
-    polyline_encoded = polyline.encode(polyline_coord)
-    poly_test = polyline.encode(polyline_str)
     distance = response["resourceSets"][0]["resources"][0]["travelDistance"]
     duration = response["resourceSets"][0]["resources"][0]["travelDuration"]
     route = response["resourceSets"][0]["resources"][0]["routeLegs"][0]["itineraryItems"]
@@ -42,4 +39,4 @@ def itineraire(traj):
     for step in route:
         print(step['instruction'])
 test = ["48.8566,2.3522" , "51.5074,-0.1278" , "46.5468,1.6639"]
-itineraire(test)         
+itineraire(test)

@@ -3,6 +3,7 @@ import numpy as np
 from python_tsp.distances import great_circle_distance_matrix
 from python_tsp.exact import solve_tsp_dynamic_programming
 import api_logicout
+import csv
 
 def route_calculation(RouteA,RouteB):
     """
@@ -43,12 +44,9 @@ def comparison(idA,idB):
 
     Args:
         idA (int): The index of the first route(A)
-        idB (int): The index of the seconde route(B)
+        idB (int): The index of the second route(B)
     """
     #Gathering the data on the two routes given:
-    
-    dataA = []
-    dataB = []
     PolylineA = np.array([
         [50.63194,3.0575],
         [50.28917,2.78],
@@ -60,8 +58,8 @@ def comparison(idA,idB):
         [48.99056,1.71667]
         ])
     #Creating the merged optimized path:
-    path = route_calculation(PolylineA,PolylineB)
-    results = api_logicout.calcul_couts(path)
+    #path = route_calculation(PolylineA,PolylineB)
+    #results = api_logicout.calcul_couts(path)
     
 
 if __name__ == "__main__":
@@ -77,4 +75,4 @@ if __name__ == "__main__":
         [48.99056,1.71667]
         ])
 
-    print(route_calculation(TestA,TestB))
+    ###print(route_calculation(TestA,TestB))
