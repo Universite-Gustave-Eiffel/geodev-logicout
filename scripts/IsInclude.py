@@ -65,10 +65,13 @@ if __name__ == "__main__":
     # Example of the use of this function
 
     filename = "simulations_reel_gdf.csv"
-    gdf = use_data.create_gdf(filename,'cheflieu') # dataframe du fichier csv choisi
+    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     dist = 100000
 
     tournee = gdf.iloc[[1]]
 
     print(IsIn_tournee_gdf(tournee, gdf, dist, 1).shape[0])
     print(IsIn_tournee_gdf(tournee, gdf, dist, 2).shape[0])
+
+    # print(gdf[gdf['id_simulation']==1131])
+

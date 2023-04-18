@@ -16,6 +16,38 @@ They are not open for confidentiality reasons but you can contact the [SPLOTT la
 - trajet.csv : trips between two stops
 - usage.csv : metadata on the platform usage (for data quality control)
 
+To use the API present in the code, you will need:
+
+- A logicout API key
+- A Google Maps or Mapbox API key
+
+You will need to put these keys in a `.env` file at the root of the repo, formatted as follows :
+
+``` env
+LOGICOUT_KEY='my_key'
+GMAPS_KEY='my_key'
+```
+or
+``` env
+LOGICOUT_KEY='my_key'
+MAPBOX_KEY='my_key'
+```
+
+# Instructions
+## Preparation of the environement
+The dependencies used for the project are listed on the file `environment.yml`
+
+## Prepare the data
+Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored in the  `data/raw` folder).
+
+This script will take as input the files .csv from logicout's database and make spatial and attributaires joins between tables to filter the data by entry, user and localization. 
+This process will create the files `data/raw/simulations_gdf.csv` and `data/raw/simulations_reel_gdf.csv`
+
+For the purpose of this study we will only use the file `simulations_reel_gdf.csv` , that contains the selected data of 1096 simulations made in the Logicout application.
+
+
+
+
 # Licence 
 
 This work is licensed under an 
