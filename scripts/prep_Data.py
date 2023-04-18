@@ -72,15 +72,15 @@ def create_point_arret_df(filename) :
 
 
 
-#creation and filtering of utilisateurs dataframe
+#Creation and filtering of utilisateurs dataframe
 df_utilisateurs = create_utilisateurs_df('utilisateurs.csv')
 df_utilisateurs= df_utilisateurs[df_utilisateurs['prise en compte O/N ENSG']=='oui']
 
-#creation of simulation dataframe and join with utilisateurs df
+#Creation of simulation dataframe and join with utilisateurs df
 df_simulation = create_simulation_df('simulation.csv')
 df_simulation_reel = df_simulation[df_simulation['type_simulation']=='reel']
 
-#creation of point_arret dataframe and join with utilisateurs_simulations
+#Creation of point_arret dataframe and join with utilisateurs_simulations
 df_point_arret = create_point_arret_df('point_arret.csv')
 
 
@@ -106,33 +106,36 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     #join segments of lines
     geo_df = gdf_simulation_arrets.groupby(['id_simulation', 'id_utilisateur'],as_index=False)['geometry'].apply(lambda x: LineString(x.tolist()) if x.size > 1 else None)
 
-    #set CRS and change to Lambert 2193
+    #Setting the CRS and setting the projection to Lambert 2193
     geo_df = gpd.GeoDataFrame(geo_df, geometry='geometry',crs="EPSG:4326")
     geo_df= geo_df.to_crs("EPSG:2154")
 
-    #Remove invalid geometries- "lines" made of two identical points
+    #Removing invalid geometries- "lines" made of two identical points
     geo_df = geo_df[geo_df['geometry'].is_valid==True]
       
 
-    geo_df['start']= geo_df['geometry'].apply(lambda x: Point(x.coords[0])) # we take the first point of the simmulation to verify where it is
+    geo_df['start']= geo_df['geometry'].apply(lambda x: Point(x.coords[0])) # Taking the first point of the simmulation to verify its position
     geo_df= gpd.GeoDataFrame(geo_df,geometry='start') #A Geodataframe can only have one geometry at a time. We change it to "Start" point to join it with the layer "communes"
   
     geo_df_commune = geo_df.sjoin(df_communes,how='left')
-    geo_df_commune = geo_df_commune.drop(columns=['index_right']) #drop the column to do the jointure
+    geo_df_commune = geo_df_commune.drop(columns=['index_right']) #Dropping the column to join effectively
 
     
-    geo_df_chef_lieu = geo_df_commune.merge(df_cheflieu,left_on='ID', right_on='ID_COM') # attributaire join with the id of the cheflieu
+    geo_df_chef_lieu = geo_df_commune.merge(df_cheflieu,left_on='ID', right_on='ID_COM') # proerty based join with the id of the 'cheflieu'
     geo_df_chef_lieu = geo_df_chef_lieu.rename(columns ={'geometry_x':'itineraire','geometry_y':'cheflieu'})
 
     
     geo_df_chef_lieu = gpd.GeoDataFrame(geo_df_chef_lieu,geometry='itineraire')
 
-
+    # Joining the chef_lieu dataframe onto the france dataframe
     geo_df_chef_lieu = geo_df_chef_lieu.sjoin(df_france,how='left')
     geo_df_chef_lieu = gpd.GeoDataFrame(geo_df_chef_lieu,geometry='start')
+    
+    #Cleaning the dataframe
     geo_df_chef_lieu = geo_df_chef_lieu.drop(columns=['index_right','ID_right','ID_left','NOM_M','NOM','INSEE_REG'])        
     print(geo_df_chef_lieu.head())
     print(geo_df_chef_lieu.geometry)
+    #Returning the final dataframe
     return geo_df_chef_lieu
 
 
