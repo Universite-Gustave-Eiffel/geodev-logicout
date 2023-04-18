@@ -10,7 +10,7 @@ root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to 
 radius_=100000
 buffer_hull_= 1000
 type_= 1
-geo_df_= use_data.create_gdf('_simulations_reel_gdf.csv','cheflieu')
+geo_df_= use_data.create_gdf('simulations_reel_gdf.csv','cheflieu')
 
 
 
