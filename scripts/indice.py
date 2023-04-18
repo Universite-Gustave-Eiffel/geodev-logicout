@@ -22,17 +22,17 @@ def dist_start(A, B):
     return dist_start
 
 
-def indice(A,B,dist_start,dist):
+def indice(A,B,dist_start,buffer):
     """ 
     Cette fonction permet de calculer l'indice des distances pour l'algorithme de mutualisation
     Input : A, B (geodataframe) : geodataframe des 2 tournées A et B
             dist_start (numpy.float64) : distance entre les 2 points de départs des 2 tournées A et B en mètres
-            dist (float) : distance en mètres du rayon du buffer
+            buffer (float) : distance en mètres du rayon du buffer
     Output : indice (numpy.float64) : l'indice des distances
     """
 
     # Calcul de la distance (100km) au carré
-    aire = np.pi*dist**2
+    aire = np.pi*buffer**2
 
     # Récupération de la liste des points de A
     linestringA = A['geometry']
@@ -77,24 +77,45 @@ def indice(A,B,dist_start,dist):
 
     return ind
 
+def ind_calc(A,gdf,buffer):
+
+    # Récupération du nombre de ligne dans le gdf
+    nb_lines = gdf.count()[0]
+
+    # Création des 2 géométries
+    # geometry = gdf['start'].map(wkt.loads)
+    gdf1 = gpd.GeoDataFrame(gdf, geometry=gdf['start'].map(wkt.loads), crs = 'EPSG:2154')
+    # geometry = gdf['itineraire'].map(wkt.loads)
+    gdf2 = gpd.GeoDataFrame(gdf, geometry=gdf['itineraire'].map(wkt.loads), crs = 'EPSG:2154')
+    All_ind = []
+    for i in range(nb_lines):
+        dist = dist_start(A,gdf1.iloc[[i]])
+        ind = indice(A,gdf2.iloc[[i]],dist,buffer)
+        print('dist_start : ', dist)
+        print('indice : ', ind)
+        All_ind.append(ind)
+
+    return All_ind
 
 
+    
 
 if __name__ == "__main__":
 
+    
     # gdf= use_data.create_gdf('simulations_reel_gdf.csv')
 
     # Numéro des lignes des 2 tournées choisies dans le geodataframe
-    pos1 = 821
+    pos1 = 0
     pos2 = 58
-
+    
     # Changement de la géométrie vers start
     gdf1 = use_data.create_gdf('simulations_reel_gdf.csv', 'start')
-
+    
     # Récupération de 2 éléments
     A = gdf1.iloc[[pos1]]
     B = gdf1.iloc[[pos2]]
-
+    """
     # Calcul de la distance entre les 2 points de départ
     dist_start = dist_start(A, B)
 
@@ -108,3 +129,7 @@ if __name__ == "__main__":
     # Calcul de l'indice
     ind = indice(A,B,dist_start,100000)
     print(ind)
+    """
+    # Application de la fonction ind_calc sur toutes les données
+    All_ind = ind_calc(A,gdf1,100000)
+    print(All_ind)
