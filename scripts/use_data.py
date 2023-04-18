@@ -2,6 +2,7 @@ import os
 import geopandas as gpd
 import pandas as pd
 from shapely import wkt
+
 from shapely.geometry import Point, LineString, shape
 
 
@@ -15,10 +16,12 @@ def create_gdf(filename, ColumnGeometry) :
     """
     root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
     dirname = "/data/raw/" # relative path to the gitignore directory - the function on the file _dataframes_gpd.py is adapted to find the relative path of this directory
+
     df = pd.read_csv(root +dirname+ filename,sep=';')
     geometry = df[ColumnGeometry].map(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs = 'EPSG:2154')
     return gdf
+
 
 
 def line_to_points(line):
@@ -41,7 +44,6 @@ def line_to_coord(linestring):
 
     return C    
              
-
 # def affichage():
 #     # Affichage graphique pour certaines valeurs
 #     if i % 500 == 0:
@@ -57,7 +59,6 @@ def line_to_coord(linestring):
 #         output = root+"/data/raw/"+str(i)+"_simulation.html"
 #         m.save(output)
 
-
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
@@ -69,3 +70,4 @@ if __name__ == "__main__":
     A = gdf.iloc[[0]]
     linestring = A['geometry']
     print(line_to_coord(linestring))
+
