@@ -11,14 +11,13 @@ def create_gdf(filename, ColumnGeometry) :
     Create geodataframes from the real simulation files
 
     Args:
-        path_trajet (string): name of file in the directory ../data/raw
-
+        filename (string): name of file in the directory ../data/raw
+        ColumnsGeometry (string): name of the column to be defined as the geometry of the Geodataframe 
     """
     root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
     dirname = "/data/raw/" # relative path to the gitignore directory - the function on the file _dataframes_gpd.py is adapted to find the relative path of this directory
-
-    df = pd.read_csv(root +dirname+ filename,sep=';')
-    geometry = df[ColumnGeometry].map(wkt.loads)
+    df = pd.read_csv(root + dirname+ filename,sep=';')
+    geometry = df[ColumnsGeometry].map(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs = 'EPSG:2154')
     return gdf
 
