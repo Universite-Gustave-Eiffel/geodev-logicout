@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import use_data
 import IsInclude
 
@@ -25,80 +26,109 @@ def histo(filename, dictFilename, dist, type, dictType):
 
 
 
+def histo_comparaison(single_incluson, double_inclusion):
 
-def comparaison(filename, dist, type):
+    labels = ['50 km', '100 km', '150 km']
+
+    x = np.arange(len(labels))  # the label locations
+    width = 0.35  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/2, single_incluson, width, label='simple inclusion', color='deepskyblue')
+    rects2 = ax.bar(x + width/2, double_inclusion, width, label='double inclusion', color='mediumorchid')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_xlabel("km du rayon considéré")
+    ax.set_ylabel("% de tournées n'ayant aucune tournées dans son rayon")
+    ax.set_title('Comparaison entre une simple et une double inclusion, pour des rayons différents')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+    autolabel(rects1, ax)
+    autolabel(rects2, ax)
+    fig.tight_layout()
+    plt.show()
+    return 'Tracé effectué !'
+
+def autolabel(rects, ax):
+    """Attach a text label above each bar in *rects*, displaying its height."""
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+
+
+
+
+
+def Pas_mutu(filename, dist):
     gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     n = gdf.count()[0] # number of total rounds
-    nbr_sans_mutu = 0
-    for i in range(n):
-        tournee = gdf.iloc[[i]]
-        gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, dist, type)
-        if gdf_IsInclude.count()[0] == 0:
-            nbr_sans_mutu += 1
-    
-    return [type, dist, n, nbr_sans_mutu]
-
-def histo_0_mutu_bis():
-    x1 = [1, 2, 2, 3, 4, 4, 4]
-    x2 = [1, 1, 1, 2, 2, 3, 3]
-    bins = [x + 0.5 for x in range(0, 4)]
-    plt.hist([x1, x2], bins = bins, color = ['deepskyblue', 'mediumorchid'], label = ['simple', 'double'])
-    plt.ylabel("% de tournées n'ayant aucune tournées dans son rayon")
-    plt.xlabel('km du rayon considéré')
-    plt.title('Comparaison entre une simple et une double inclusion, pour des rayons différents')
-    plt.legend()
-    plt.show()
-    return 'Histogramme tracé !'
-
-def histo_0_mutu():
-    dist = [50e3, 100e3, 150e3]
-    typeIsIn = [1, 2]
-    dictType = {1:"simple", 2:"double"}
-
-    # Préparation de la figure
-    fig = plt.figure()
-    ax = fig.add_axes([0, 0, 1, 1])
-
-    etiquettes = ['C', 'C++', 'Java', 'Python', 'PHP']
-    valeurs = [23, 17, 35, 29, 12]
-
-    # Affichage des données
-    ax.bar(etiquettes, valeurs)
-
-    plt.title("Histogramme")  # Titre du graphique
-    ax.set_ylabel('Valeurs')  # Titre de l'axe y
-    ax.set_xlabel('Langages de programmation')
-    ax.legend()
-    plt.show()  # Affichage d'une courbe
-
-    # fig = plt.figure()
-    # ax = fig.add_axes([0, 0, 1, 1])
-    # x = ['50', '100', '150'] # définition des étiquettes pour chaque bin
-    # y1 = [1, 2, 3] # pourcentage à obtenir pour =>
-    # y2 = [1, 1, 1] # pourcentage à obtenir pour <=>
-
-    # bins = [x + 0.5 for x in range(0, 4)]  # définit les bins pour l'histogramme
-    # ax.bar(x, y1)
-    # ax.bar(x, y1)
-    # # plt.hist([y1, y2], bins=bins, color = ['deepskyblue', 'slateblue'], label = ['simple', 'double'])
-    # # plt.xticks(bins, x)
-    # plt.title('Comparaison entre une simple et une double inclusion, pour des rayons différents')
-    # plt.xlabel('km du rayon considéré')
-    # plt.ylabel("% de tournées n'ayant aucune tournées dans son rayon")
-    # # plt.legend(['simple', 'double'])
-
-    # plt.show()
+    L1 = []
+    L2 = []
+    for j in range(1,3):
+        for d in dist:
+            pas_mutu = 0
+            for i in range(n):
+                tournee = gdf.iloc[[i]]
+                gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, d, j)
+                if gdf_IsInclude.count()[0] == 0:
+                    pas_mutu += 1
+            if i == 1:
+                L1.append(pas_mutu * 100 / n)
+            if i == 2:
+                L2.append(pas_mutu * 100 / n)
+    return L1, L2
 
 
 
+def Mean_mutu(filename, dist):
+    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
+    n = gdf.count()[0] # number of total rounds
+    L1 = []
+    L2 = []
+    for j in range(1,3):
+        for d in dist:
+            mean_mutu = 0
+            for i in range(n):
+                tournee = gdf.iloc[[i]]
+                gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, d, j)
+                mean_mutu += gdf_IsInclude.count()[0]
+            mean_mutu = mean_mutu / n
+            if i == 1:
+                L1.append(mean_mutu * 100 / n)
+            if i == 2:
+                L2.append(mean_mutu * 100 / n)
+    return L1, L2
 
 
 
-# etiquettes = ['C', 'C++', 'Java', 'Python', 'PHP']
-# valeurs = [23, 17, 35, 29, 12]
+def Max_mutu(filename, dist):
+    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
+    n = gdf.count()[0] # number of total rounds
+    L1 = []
+    L2 = []
+    for j in range(1,3):
+        for d in dist:
+            max_mutu = 0
+            for i in range(n):
+                tournee = gdf.iloc[[i]]
+                gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, d, j)
+                mutu = gdf_IsInclude.count()[0]
+                if mutu > max_mutu:
+                    max_mutu = mutu
+            if i == 1:
+                L1.append(max_mutu * 100 / n)
+            if i == 2:
+                L2.append(max_mutu * 100 / n)
+    return L1, L2
 
-# # Affichage des données
-# ax.bar(etiquettes, valeurs)
+
+
 
 
 
@@ -121,9 +151,7 @@ if __name__ == "__main__":
 
     ###      Obtenir des comparaisons quantitatives      ###
 
-    # for d in dist:
-    #     for type in typeIsIn:
-    #         print(comparaison(filename, d, type))
+    single_incluson, double_inclusion = Pas_mutu(filename, dist)
+    print(histo_comparaison(single_incluson, double_inclusion))
 
-    print(histo_0_mutu())
 
