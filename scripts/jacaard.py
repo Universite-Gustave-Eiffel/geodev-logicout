@@ -11,7 +11,7 @@ This module has a function that, for a specific row of a Geopandas's dataframe, 
 
 """
 
-def jacaard_index(row,geodataframe,dist,buffer_convex_hull,type):
+def jacaard_index(row,geodataframe,buffer_convex_hull):
 
 
 
@@ -25,14 +25,14 @@ def jacaard_index(row,geodataframe,dist,buffer_convex_hull,type):
 
     Args:
         row {geopandas Geodataframe line}: a row of an geodataframe
-        geodataframe {geopandas Geodataframe}: name of file in the directory ../data/raw
+        geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraires for the given row
         radius {int}: buffer size in meters´
         dist {int}: buffer size in meters
         buffer_hull {int}: size of the buffer applied to the lines before generating the convex hull
         type {int}: 1 => single buffer inclusion | 2 => double buffer inclusion
     """    
     #call the function to generate the table of itineraires that are mutualisables
-    geo_df_envelop = IsInclude.IsIn_tournee_gdf(row,geodataframe,dist,type)
+    
 
     
     #to find the indexes
@@ -41,7 +41,7 @@ def jacaard_index(row,geodataframe,dist,buffer_convex_hull,type):
 
 
      # we change the geometry to itineraire
-    geo_df_envelop=gpd.GeoDataFrame(geo_df_envelop, geometry =geo_df_envelop['itineraire_right'].map(wkt.loads)) #we do the same for the mutualisable
+    geo_df_envelop=gpd.GeoDataFrame(geodataframe, geometry =geodataframe['itineraire_right'].map(wkt.loads)) #we do the same for the mutualisable
 
     row=gpd.GeoDataFrame(row, geometry=row['itineraire'].map(wkt.loads),crs = 'EPSG:2154') 
 
