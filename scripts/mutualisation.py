@@ -3,6 +3,8 @@ import numpy as np
 from python_tsp.distances import great_circle_distance_matrix
 from python_tsp.exact import solve_tsp_dynamic_programming
 import api_logicout
+import geopandas as gpd
+import use_data
 import csv
 
 def route_calculation(RouteA,RouteB):
@@ -38,29 +40,39 @@ def route_calculation(RouteA,RouteB):
     
     return(path)
 
-def comparison(idA,idB):
+def comparison(idA,idB,gdf):
     """
     Takes the IDs of two routes and returns the time,money and gas emission saved
 
     Args:
         idA (int): The index of the first route(A)
         idB (int): The index of the second route(B)
+        gdf (geodataframe): A gdf containing data on all the routes (created from simulation_reel_gdf.csv)
     """
-    #Gathering the data on the two routes given:
-    PolylineA = np.array([
-        [50.63194,3.0575],
-        [50.28917,2.78],
-        [50.37083,3.07917]
-        ])
-    PolylineB = np.array([
-        [49.61694,0.75306],
-        [48.850322,2.308333],
-        [48.99056,1.71667]
-        ])
-    #Creating the merged optimized path:
-    #path = route_calculation(PolylineA,PolylineB)
-    #results = api_logicout.calcul_couts(path)
-    
+    #Getting the array containing the coordinates of the two routes
+    trajA = use_data.line_to_coord(
+        gdf[gdf['id_simulation']==idA]['itineraire']
+        )
+    trajB = use_data.line_to_coord(
+        gdf[gdf['id_simulation']==idB]['itineraire']
+        )
+    #Computing the new path
+    traj_mutu = route_calculation(trajA,trajB)
+    #Sending the new path to the logicout API
+    ###results = api_logicout.calcul_couts(traj_mutu)
+    #Gathering the data from the two original paths
+    dataA = []
+    dataB = []
+    with open('trajet.csv', mode='r') as file:
+        reader = csv.reader(file)
+        
+        #Ignore the header
+        next(reader)
+        for row in reader:
+            if row[1] == idA:
+                dataA = row
+            if row[1] == idB:
+                dataB = idB
 
 if __name__ == "__main__":
 
