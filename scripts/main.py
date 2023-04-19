@@ -30,7 +30,7 @@ def algo_une_tournee(tournee, gdf, inclusion, filename, radius, buffer_convex_hu
     nb_lines = gdf_IsInclude.count()[0]
 
     result = []
-    result.append(tournee['id_simulation'].values[0])
+    # result.append(tournee['id_simulation'].values[0])
 
     for i in range(nb_lines):
 
@@ -44,18 +44,21 @@ def algo_une_tournee(tournee, gdf, inclusion, filename, radius, buffer_convex_hu
         # Indice final 
         de = ind_dist*(1-ind_env)
 
-        result.append([gdf2_IsInclude.iloc[[i]]['id_simulation_right'].values[0],ind_dist,ind_env,de])
-        print([gdf2_IsInclude.iloc[[i]]['id_simulation_right'].values[0],ind_dist,ind_env,de])
+        result.append([tournee['id_simulation'].values[0],gdf2_IsInclude.iloc[[i]]['id_simulation_right'].values[0],ind_dist,ind_env,de])
+        print([tournee['id_simulation'].values[0],gdf2_IsInclude.iloc[[i]]['id_simulation_right'].values[0],ind_dist,ind_env,de])
     
+    headerList = ['id_A','id_B','ind distance','ind enveloppe','ind regroupé']
+
     # Sauvegarde dans un csv
     # np.savetxt(file_output, result , delimiter=' ') 
     with open('_final.csv','w') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        for i in range(len(result)):
-            csvwriter.writerows(result[i])
+        csvwriter = csv.writer(csvfile, delimiter=';')
+        # csvwriter.writeheader()
+        csvwriter.writerows(result)
 
         
-        
+        # A regarder :  changer la boucle et le gdf sur lequel on extrait les données, pour mettre celui de l'enveloppe convexe.
+        # Regarder aussi pour mettre un header sur le fichier csv
 
         
     
