@@ -6,6 +6,7 @@ from shapely.geometry import Point, LineString, shape
 import matplotlib as plt
 import numpy as np
 from shapely import wkt
+import csv
 
 # File imports
 
@@ -34,7 +35,7 @@ def algo_une_tournee(tournee, gdf, inclusion, filename, radius, buffer_convex_hu
     for i in range(nb_lines):
 
         # Indice de distance 
-        dist_start = dist_start(tournee,gdf1_IsInclude.iloc[[i]])
+        dist_start = indice.dist_start(tournee,gdf1_IsInclude.iloc[[i]])
         ind_dist = indice.indice(tournee,gdf2_IsInclude.iloc[[i]],dist_start,radius)
 
         # Indice d'enveloppe convexe
@@ -43,11 +44,17 @@ def algo_une_tournee(tournee, gdf, inclusion, filename, radius, buffer_convex_hu
         # Indice final 
         de = ind_dist*(1-ind_env)
 
-        result.append([gdf2_IsInclude.iloc[[i]]['id_simulation'].values[0],ind_dist,ind_env,de])
-        print([gdf2_IsInclude.iloc[[i]]['id_simulation'].values[0],ind_dist,ind_env,de])
-
+        result.append([gdf2_IsInclude.iloc[[i]]['id_simulation_right'].values[0],ind_dist,ind_env,de])
+        print([gdf2_IsInclude.iloc[[i]]['id_simulation_right'].values[0],ind_dist,ind_env,de])
     
-    np.savetxt(file_output, result , delimiter=' ') 
+    # Sauvegarde dans un csv
+    # np.savetxt(file_output, result , delimiter=' ') 
+    with open('_final.csv','w') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        for i in range(len(result)):
+            csvwriter.writerows(result[i])
+
+        
         
 
         
@@ -61,6 +68,6 @@ if __name__ == "__main__":
     radius = 100000
     buffer_convex_hull = 1000
     inclusion = 2
-    file_output = '../data/resultats/indice/ind.txt'
+    file_output = 'ind.txt'
 
     algo_une_tournee(tournee, gdf, inclusion, filename, radius, buffer_convex_hull, file_output)

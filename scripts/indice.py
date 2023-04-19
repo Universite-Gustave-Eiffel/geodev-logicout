@@ -39,12 +39,12 @@ def indice(A,B,dist_start,buffer):
     
     # Récupération de la liste des points de B
     linestringB = B['geometry']
-    
+    print(linestringA)
     # On découpe le linestring en plusieurs points
     
     pointsA = linestringA.apply(use_data.line_to_points).explode()
     pointsB = linestringB.apply(use_data.line_to_points).explode()
-    print(type(pointsA))
+
     """
     print('--------------------')
     print('Points de A : ')
@@ -108,8 +108,8 @@ if __name__ == "__main__":
     # gdf= use_data.create_gdf('simulations_reel_gdf.csv')
 
     # Numéro des lignes des 2 tournées choisies dans le geodataframe
-    pos1 = 0
-    pos2 = 58
+    pos1 = 379
+    pos2 = 8248
     
     # Changement de la géométrie vers start
     gdf1 = use_data.create_gdf('simulations_reel_gdf.csv', 'start')
