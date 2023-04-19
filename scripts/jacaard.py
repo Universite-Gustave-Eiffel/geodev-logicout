@@ -9,7 +9,7 @@ This module has a function that, for a specific row of a Geopandas's dataframe, 
 
 """
 
-def jacaard_index(row,geodataframe,dist,buffer_convex_hull,type):
+def jacaard_index(row,geo_df_envelop,dist,buffer_convex_hull,type):
 
 
 
@@ -30,7 +30,7 @@ def jacaard_index(row,geodataframe,dist,buffer_convex_hull,type):
         type {int}: 1 => single buffer inclusion | 2 => double buffer inclusion
     """    
     #call the function to generate the talbe of itineraires that are mutualisables
-    geo_df_envelop = IsInclude.IsIn_tournee_gdf(row,geodataframe,dist,type)
+    # geo_df_envelop = IsInclude.IsIn_tournee_gdf(row,geodataframe,dist,type)
 
 
 

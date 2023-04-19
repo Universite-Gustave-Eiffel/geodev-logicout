@@ -41,16 +41,18 @@ def indice(A,B,dist_start,buffer):
     linestringB = B['geometry']
     
     # On découpe le linestring en plusieurs points
+    
     pointsA = linestringA.apply(use_data.line_to_points).explode()
     pointsB = linestringB.apply(use_data.line_to_points).explode()
-
+    print(type(pointsA))
+    """
     print('--------------------')
     print('Points de A : ')
     print(pointsA)
     print('--------------------')
     print('Points de B : ')
     print(pointsB)
-
+    """
     # Calcule la distance entre les points les plus éloignés entre les deux GeoDataFrames
     """
     Attention : à verifier si la distance est faite entre les points du coupleA et ceux du coupleB 2 à 2, ou alors 
@@ -65,13 +67,13 @@ def indice(A,B,dist_start,buffer):
 
     # On récupère la distance la plus grande dans le tableau
     max_distance = max(C)
-    
+    """
     print('--------------------')
     print("dist_start : ",dist_start)
     print("max_distance : ",max_distance)
     print("aire : ",aire)
     print('--------------------')
-
+    """
     # On calcule l'indice avec la formule suivante :
     ind = dist_start * max_distance / aire
 
@@ -115,7 +117,7 @@ if __name__ == "__main__":
     # Récupération de 2 éléments
     A = gdf1.iloc[[pos1]]
     B = gdf1.iloc[[pos2]]
-    """
+
     # Calcul de la distance entre les 2 points de départ
     dist_start = dist_start(A, B)
 
@@ -129,7 +131,8 @@ if __name__ == "__main__":
     # Calcul de l'indice
     ind = indice(A,B,dist_start,100000)
     print(ind)
-    """
+    
+    print(A['id_simulation'].values[0])
     # Application de la fonction ind_calc sur toutes les données
-    All_ind = ind_calc(A,gdf1,100000)
-    print(All_ind)
+    # All_ind = ind_calc(A,gdf1,100000)
+    # print(All_ind)
