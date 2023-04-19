@@ -52,7 +52,7 @@ def create_utilisateurs_df(filename) :
 
     """   
 
-    df = pd.read_csv(root +"/data/raw/"+ filename,sep=';',encoding='cp1252')
+    df = pd.read_excel(root +"/data/raw/"+ filename)
 
     return df
     
@@ -73,7 +73,7 @@ def create_point_arret_df(filename) :
 
 
 #Creation and filtering of utilisateurs dataframe
-df_utilisateurs = create_utilisateurs_df('utilisateurs.csv')
+df_utilisateurs = create_utilisateurs_df('utilisateur 0603_Etudiants ENSG_nettoyé.xls')
 df_utilisateurs= df_utilisateurs[df_utilisateurs['prise en compte O/N ENSG']=='oui']
 
 #Creation of simulation dataframe and join with utilisateurs df
