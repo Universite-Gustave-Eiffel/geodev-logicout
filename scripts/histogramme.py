@@ -26,7 +26,7 @@ def histo(filename, dictFilename, dist, type, dictType):
 
 
 
-def histo_comparaison(single_incluson, double_inclusion):
+def histo_comparaison(single_incluson, double_inclusion, type):
 
     labels = ['50 km', '100 km', '150 km']
 
@@ -39,7 +39,12 @@ def histo_comparaison(single_incluson, double_inclusion):
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_xlabel("km du rayon considéré")
-    ax.set_ylabel("% de tournées n'ayant aucune tournées dans son rayon")
+    if type == 'Pas':
+        ax.set_ylabel("% de tournées n'ayant aucune tournées dans son rayon")
+    if type == 'Mean':
+        ax.set_ylabel("nombre de tournées moyennes dans un rayon de X km")
+    if type == 'Max':
+        ax.set_ylabel("nombre maximum de tournées dans un rayon de X km")
     ax.set_title('Comparaison entre une simple et une double inclusion, pour des rayons différents')
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
@@ -78,10 +83,10 @@ def Pas_mutu(filename, dist):
                 gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, d, j)
                 if gdf_IsInclude.count()[0] == 0:
                     pas_mutu += 1
-            if i == 1:
-                L1.append(pas_mutu * 100 / n)
-            if i == 2:
-                L2.append(pas_mutu * 100 / n)
+            if j == 1:
+                L1.append(int(pas_mutu * 100 / n))
+            if j == 2:
+                L2.append(int(pas_mutu * 100 / n))
     return L1, L2
 
 
@@ -99,10 +104,10 @@ def Mean_mutu(filename, dist):
                 gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, d, j)
                 mean_mutu += gdf_IsInclude.count()[0]
             mean_mutu = mean_mutu / n
-            if i == 1:
-                L1.append(mean_mutu * 100 / n)
-            if i == 2:
-                L2.append(mean_mutu * 100 / n)
+            if j == 1:
+                L1.append(int(mean_mutu))
+            if j == 2:
+                L2.append(int(mean_mutu))
     return L1, L2
 
 
@@ -121,10 +126,10 @@ def Max_mutu(filename, dist):
                 mutu = gdf_IsInclude.count()[0]
                 if mutu > max_mutu:
                     max_mutu = mutu
-            if i == 1:
-                L1.append(max_mutu * 100 / n)
-            if i == 2:
-                L2.append(max_mutu * 100 / n)
+            if j == 1:
+                L1.append(int(max_mutu))
+            if j == 2:
+                L2.append(int(max_mutu))
     return L1, L2
 
 
@@ -151,7 +156,17 @@ if __name__ == "__main__":
 
     ###      Obtenir des comparaisons quantitatives      ###
 
-    single_incluson, double_inclusion = Pas_mutu(filename, dist)
-    print(histo_comparaison(single_incluson, double_inclusion))
+    # single_incluson, double_inclusion = Pas_mutu(filename, dist)
+    # type = 'Pas'
+
+    # single_incluson, double_inclusion = Mean_mutu(filename, dist)
+    # type = 'Mean'
+
+    single_incluson, double_inclusion = Max_mutu(filename, dist)
+    type = 'Max'
+
+    print(single_incluson)
+    print(double_inclusion)
+    print(histo_comparaison(single_incluson, double_inclusion, type))
 
 
