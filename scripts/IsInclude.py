@@ -70,8 +70,8 @@ if __name__ == "__main__":
 
     tournee = gdf.iloc[[1]]
 
-    print(IsIn_tournee_gdf(tournee, gdf, dist, 1).shape[0])
-    print(IsIn_tournee_gdf(tournee, gdf, dist, 2).shape[0])
+    #print(IsIn_tournee_gdf(tournee, gdf, dist, 1).shape[0])
+    #print(IsIn_tournee_gdf(tournee, gdf, dist, 2).shape[0])
 
-    # print(gdf[gdf['id_simulation']==1131])
+    print(gdf[gdf['id_simulation']==1131])
 

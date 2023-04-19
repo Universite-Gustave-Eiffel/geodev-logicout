@@ -51,6 +51,7 @@ def calcul_couts(traj):
     #print(json_response)
     logging.info(str(date.today())+str(json_response))
     
+    return(json_response)
         
-test = [(48.8566,2.3522), (46.5468,1.6639)]
-calcul_couts(test)
+#test = [(48.8566,2.3522), (46.5468,1.6639)]
+#calcul_couts(test)

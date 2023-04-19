@@ -5,7 +5,7 @@ from shapely import wkt
 
 from shapely.geometry import Point, LineString, shape
 
-def create_gdf(filename, ColumnGeometry) :
+def create_gdf(filename, ColumnsGeometry) :
     """
     Create geodataframes from the real simulation files
 
