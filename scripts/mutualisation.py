@@ -20,7 +20,6 @@ def route_calculation(RouteA,RouteB):
     #We merge the two sets of coordinates together
     print(RouteA,RouteB)
     merged_coord = np.append(RouteA,RouteB,axis=0)
-    print(merged_coord)
     #Now we have to optimize this list of coordinates, i.e rearranging them in the right order to minimize the travel time and the distance,
     #starting with the 1st point from A, then going to the 1st point from B
     
@@ -29,10 +28,8 @@ def route_calculation(RouteA,RouteB):
     #We then modify the distance matrix to set the distance between A1 & B1 to zero, so that the algorithm is forced to put them one after the other
     i = np.where(np.isclose(merged_coord, RouteB[0]))
     distance_matrix[0,i] = 0
-    print(distance_matrix)
     #Then we get the permutation list, which is containing the order in which we need to rearrange the indexes from all_coord
     permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
-    print(permutation,distance)
     #We then rearrange the all_coord array into a new array
     rearranged_coord = np.zeros(np.shape(merged_coord))
     for i in range(len(permutation)):
@@ -62,6 +59,9 @@ def comparison(idA,idB,gdf):
     )
     #Computing the new path
     traj_mutu = route_calculation(trajA,trajB)
+    print("Le trajet mutualisé est "+str(traj_mutu))
+    
+    
     #Sending the new path to the logicout API
     results = api_logicout.calcul_couts(traj_mutu)
     #Gathering the data from the two original paths

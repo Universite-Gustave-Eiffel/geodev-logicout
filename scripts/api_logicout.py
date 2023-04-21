@@ -34,7 +34,7 @@ def calcul_couts(traj):
         'duree_autres_activites': '01:30:00',
         'heure_depart': '15/03/2025 15:48',
         'service': 'mapbox',
-        'retour': False,
+        'retour': True,
         'etapes': etapes,
         "itineraire_key": mapbox_key
     }
