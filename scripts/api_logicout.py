@@ -23,7 +23,7 @@ def calcul_couts(traj):
     #Parsing the coordinates array to build the json
     etapes = []
     for point in traj:
-        etapes.append( {"latitude": point[0], "longitude": point[1], "duree_livraison": "00:10:00"})
+        etapes.append( {"latitude": point[1], "longitude": point[0], "duree_livraison": "00:10:00"})
     print(etapes)
     #Building the json used for the request
     json_logicout = {
