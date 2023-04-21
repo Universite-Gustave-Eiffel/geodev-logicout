@@ -42,15 +42,21 @@ def line_to_coord(linestring):
     return C    
              
 
+def coord_lister(geom):
+    coords = list(geom.coords)
+    return (coords)
+
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
     gdf = create_gdf(filename, 'itineraire') # dataframe du fichier csv choisi
     print(gdf)
-    
+    print(gdf.geometry.to_crs(4326))
     # Test
     # gdf = gpd.GeoDataFrame(gdf, geometry=gdf['itineraire'].map(wkt.loads),crs = 'EPSG:2154')
     A = gdf.iloc[[0]]
     linestring = A['geometry']
     print(line_to_coord(linestring))
+
+
 

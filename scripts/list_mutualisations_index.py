@@ -1,8 +1,11 @@
-import jacaard, use_data, IsInclude
-from shapely import wkt
+import jacaard, use_data, IsInclude, indexes
+from shapely import wkt, hausdorff_distance
 import geopandas as gpd
 import csv
 import os
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
 
@@ -10,15 +13,15 @@ root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to 
 radius_=100000
 buffer_hull_= 1000
 type_= 1
-geo_df_= use_data.create_gdf('_simulations_reel_gdf.csv','cheflieu')
+geo_dataframe_logicout = use_data.create_gdf('simulations_reel_gdf.csv','cheflieu')
+aire = np.pi*radius_**2
 
 
 
-def calculate_mutualisations(geo_df, dist,buffer_hull,type):
+def calculate_mutualisations(geo_df,dist,buffer_hull,type):
     """
-    Return a list containing a row for each itineraire in a geodataframe, with their ids, the ids of their mutualisables itineraires with the respective jaacard indexes,
-
-
+    Return a list containing a row for each itineraire in a geodataframe, with their ids, the ids of 
+    their mutualisables itineraires with the respective indexes,
 
     Args:
 
@@ -29,18 +32,48 @@ def calculate_mutualisations(geo_df, dist,buffer_hull,type):
     """    
 
 
-    empty_list=[]
+    mutualisations=[]
     for i in range (geo_df.shape[0]):
-    
-        df = jacaard.jacaard_index(geo_df.iloc[[i]],geo_df,dist,buffer_hull,type)
-        #df = df[df['jaacard']!=0]
-        df = df.sort_values(by='jaacard')
-        row = [[geo_df['id_simulation'].iloc[[i]].values[0],df[['id_simulation_right','jaacard']].values.tolist()]]
-        empty_list = empty_list + row
-    return empty_list
+   
+        row = geo_df.iloc[[i]] # we take the current itineraire
+        
+        gdf= IsInclude.IsIn_tournee_gdf(row,geo_df,dist,type) # we take all mutualisables itineraires
+
+        #we chech if the dataframe of the mutualisables itineraires isn't empty
+        if (gdf.shape[0]>0):  
+            gdf = jacaard.jacaard_index(row, gdf,buffer_hull) # we apply the jaacard index
 
 
-ranked_mutualisations = calculate_mutualisations(geo_df_,radius_,buffer_hull_,type_)
+            #we change the geometry of the dataframes to their starting point
+            row = gpd.GeoDataFrame(row, geometry = row['start'].map(wkt.loads)) 
+            gdf = gpd.GeoDataFrame(gdf, geometry = gdf['start_right'].map(wkt.loads)) 
+
+            # we calculate the distance between their starting points and adjust the geodataframes
+            gdf = indexes.dist_start(row,gdf) 
+            
+
+            # we change the geometry of the dataframes to their itineraires
+            row = gpd.GeoDataFrame(row, geometry = row['itineraire'].map(wkt.loads)) 
+            gdf = gpd.GeoDataFrame(gdf, geometry = gdf['itineraire_right'].map(wkt.loads))        
+
+            # We calculate the maximum distance between the itineraire and his mutualisables counterparts
+            indexes.max_distance(row,gdf) 
+            
+            # We calculate our index
+            gdf = indexes.index(gdf,aire) 
+
+            # we prepare to save the results in a csv , sorted by the index for the best mutualisations
+            gdf = gdf.sort_values(by=['index_with_jaacard'])
+            row = [[geo_df['id_simulation'].iloc[[i]].values[0],gdf[['id_simulation_right','jaacard','start_distance','max_distance','index','index_with_jaacard']].values.tolist()]]
+            mutualisations = mutualisations + row
+        
+        #if there aren't any mutualisable itineraire
+        else: 
+            mutualisations = mutualisations + [[geo_df['id_simulation'].iloc[[i]].values[0],""]]
+    return mutualisations
+
+
+ranked_mutualisations = calculate_mutualisations(geo_dataframe_logicout,radius_,buffer_hull_,type_)
 
 
 
