@@ -6,6 +6,7 @@ import api_logicout
 import geopandas as gpd
 import use_data
 import csv
+from shapely import wkt
 
 def route_calculation(RouteA,RouteB):
     """
@@ -17,8 +18,8 @@ def route_calculation(RouteA,RouteB):
         RouteB (Array): An array of coordinates /!\ Latitude THEN longitude
     """
     #We merge the two sets of coordinates together
+    print(RouteA,RouteB)
     merged_coord = np.append(RouteA,RouteB,axis=0)
-    print(merged_coord)
     #Now we have to optimize this list of coordinates, i.e rearranging them in the right order to minimize the travel time and the distance,
     #starting with the 1st point from A, then going to the 1st point from B
     
@@ -27,10 +28,8 @@ def route_calculation(RouteA,RouteB):
     #We then modify the distance matrix to set the distance between A1 & B1 to zero, so that the algorithm is forced to put them one after the other
     i = np.where(np.isclose(merged_coord, RouteB[0]))
     distance_matrix[0,i] = 0
-    print(distance_matrix)
     #Then we get the permutation list, which is containing the order in which we need to rearrange the indexes from all_coord
     permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
-    print(permutation,distance)
     #We then rearrange the all_coord array into a new array
     rearranged_coord = np.zeros(np.shape(merged_coord))
     for i in range(len(permutation)):
@@ -50,41 +49,89 @@ def comparison(idA,idB,gdf):
         gdf (geodataframe): A gdf containing data on all the routes (created from simulation_reel_gdf.csv)
     """
     #Getting the array containing the coordinates of the two routes
+    gdf['itineraire'] = gdf.geometry.to_crs(4326)
+    
     trajA = use_data.line_to_coord(
-        gdf[gdf['id_simulation']==idA]['itineraire']
-        )
+        gdf.loc[gdf['id_simulation']==idA,'itineraire']
+    )
     trajB = use_data.line_to_coord(
-        gdf[gdf['id_simulation']==idB]['itineraire']
-        )
+        gdf.loc[gdf['id_simulation']==idB,'itineraire']
+    )
     #Computing the new path
     traj_mutu = route_calculation(trajA,trajB)
+    print("Le trajet mutualisé est "+str(traj_mutu))
+    
+    
     #Sending the new path to the logicout API
-    ###results = api_logicout.calcul_couts(traj_mutu)
+    results = api_logicout.calcul_couts(traj_mutu)
     #Gathering the data from the two original paths
-    dataA = []
-    dataB = []
-    with open('trajet.csv', mode='r') as file:
+    #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
+    dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    dataB = [idB,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    with open('./data/raw/trajet.csv', mode='r') as file:
         reader = csv.reader(file)
-        
         #Ignore the header
         next(reader)
         for row in reader:
-            if row[1] == idA:
-                dataA = row
-            if row[1] == idB:
-                dataB = idB
+            if int(row[1]) == idA:
+                dataA[1]+=float(row[6])
+                dataA[2]+=float(row[5])
+                dataA[3]+=float(row[12])
+                dataA[4]+=float(row[13])
+                dataA[5]+=float(row[14])
+                dataA[6]+=float(row[15])
+                dataA[7]+=float(row[16])
+                dataA[8]+=float(row[17])
+                dataA[9]+=float(row[18])
+                dataA[10]+=float(row[19])
+                dataA[11]+=float(row[20])
+                dataA[12]+=float(row[21])
+                dataA[13]+=float(row[22])
+            if int(row[1]) == idB:
+                dataB[1]+=float(row[6])
+                dataB[2]+=float(row[5])
+                dataB[3]+=float(row[12])
+                dataB[4]+=float(row[13])
+                dataB[5]+=float(row[14])
+                dataB[6]+=float(row[15])
+                dataB[7]+=float(row[16])
+                dataB[8]+=float(row[17])
+                dataB[9]+=float(row[18])
+                dataB[10]+=float(row[19])
+                dataB[11]+=float(row[20])
+                dataB[12]+=float(row[21])
+                dataB[13]+=float(row[22])
+    field_names = ['id','idA','idB','tps_min','distance_km','cout','CO_g','COV_g','NOX_g','NH3_g','PB_g','SO2_g','PS_g','CO2_g','N2O_g','CH4_g','cout_collectif']
+    with open('trajets_mutualises.csv', mode='w', newline='') as file:
+        writer = csv.DictWriter(file,fieldnames=field_names)
+        writer.writeheader()
+        writer.writerow(
+            {'id': str(idA)+"_"+str(idB) ,
+             'idA': idA ,
+             'idB': idB ,
+             'tps_min': results['temps_passe']['total'] ,
+             'distance_km': results['kilometrage'] ,
+             'cout': results['couts']['total'] ,
+             'CO_g': results['emissions']['CO'] ,
+             'COV_g': results['emissions']['COV'] ,
+             'NOX_g': results['emissions']['NOX'] ,
+             'NH3_g': results['emissions']['NH3'] ,
+             'PB_g': results['emissions']['PB'] ,
+             'SO2_g': results['emissions']['SO2'] ,
+             'PS_g': results['emissions']['PS'] ,
+             'CO2_g': results['emissions']['CO2'] ,
+             'N2O_g': results['emissions']['N2O'] ,
+             'CH4_g': results['emissions']['CH4'],
+             'cout_collectif': results['cout_collectif']}
+        )     
+    return(results,dataA,dataB)
 
 if __name__ == "__main__":
 
-    TestA = np.array([
-        [50.63194,3.0575],
-        [50.28917,2.78],
-        [50.37083,3.07917]
-        ])
-    TestB = np.array([
-        [49.61694,0.75306],
-        [48.850322,2.308333],
-        [48.99056,1.71667]
-        ])
+    filename = "simulations_reel_gdf.csv"
+    gdf = use_data.create_gdf(filename, 'itineraire')
+    a,b,c = comparison(16316,11449,gdf)
+    
+    print("Données sur le trajet mutualisé entre le n°"+str(b[0])+" et le n°"+str(c[0])+" :" + str(a)+"\n Données sur le trajet n°"+str(b[0])+": "+str(b)+"\n Données sur le trajet n°"+str(c[0])+" : "+str(c))
 
     ###print(route_calculation(TestA,TestB))
