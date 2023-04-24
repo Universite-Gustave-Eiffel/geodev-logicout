@@ -16,4 +16,4 @@ dependencies:
   - seaborn==0.12.2
   - folium==0.14.0
   - mapclassify==2.5.0
-  - xlrd-2.0.1
+  - xlrd>=2.0.1
