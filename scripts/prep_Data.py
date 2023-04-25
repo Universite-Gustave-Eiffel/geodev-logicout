@@ -82,7 +82,7 @@ df_simulation_reel = df_simulation[df_simulation['type_simulation']=='reel']
 
 #Creation of point_arret dataframe and join with utilisateurs_simulations
 df_point_arret = create_point_arret_df('point_arret.csv')
-
+df_point_arret = df_point_arret.sort_values(by=['id','id_simulation','index'])
 
 def create_geodataframe(simulation,utilisateur,point_arret):
 
