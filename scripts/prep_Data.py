@@ -101,6 +101,7 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     # we make the first dataframes    
     df_utilisateurs_simulations =pd.merge(simulation,utilisateur, left_on='id_utilisateur', right_on='id',how='inner')
     df_simulations_arrets = pd.merge(point_arret,df_utilisateurs_simulations, left_on='id_simulation', right_on='id_x',how='inner')
+    df_simulations_arrets= df_simulations_arrets.sort_values(by=['id_simulation','index'])
     gdf_simulation_arrets= gpd.GeoDataFrame(df_simulations_arrets[['id_simulation','id_utilisateur']], geometry=gpd.points_from_xy(df_simulations_arrets.longitude, df_simulations_arrets.latitude))
 
     #join segments of lines
