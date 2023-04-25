@@ -43,21 +43,11 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
         if (gdf.shape[0]>0):  
             gdf = jacaard.jacaard_index(row, gdf,buffer_hull) # we apply the jaacard index
 
-
-            #we change the geometry of the dataframes to their starting point
-            row = gpd.GeoDataFrame(row, geometry = row['start'].map(wkt.loads)) 
-            gdf = gpd.GeoDataFrame(gdf, geometry = gdf['start_right'].map(wkt.loads)) 
-
             # we calculate the distance between their starting points and adjust the geodataframes
             gdf = indexes.dist_start(row,gdf) 
             
-
-            # we change the geometry of the dataframes to their itineraires
-            row = gpd.GeoDataFrame(row, geometry = row['itineraire'].map(wkt.loads)) 
-            gdf = gpd.GeoDataFrame(gdf, geometry = gdf['itineraire_right'].map(wkt.loads))        
-
             # We calculate the maximum distance between the itineraire and his mutualisables counterparts
-            indexes.max_distance(row,gdf) 
+            gdf = indexes.max_distance(row,gdf) 
             
             # We calculate our index
             gdf = indexes.index(gdf,aire) 

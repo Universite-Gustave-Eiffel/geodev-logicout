@@ -31,14 +31,8 @@ def jacaard_index(row,geodataframe,buffer_convex_hull):
 
     """    
     
-    #to find the indexes
-    row=gpd.GeoDataFrame(row, geometry=row['start'].map(wkt.loads),crs = 'EPSG:2154') 
-
-
-
     # we change the geometries to 'itineraire'
     geo_df_envelop=gpd.GeoDataFrame(geodataframe, geometry =geodataframe['itineraire_right'].map(wkt.loads))
-
     row=gpd.GeoDataFrame(row, geometry=row['itineraire'].map(wkt.loads),crs = 'EPSG:2154') 
 
     # we calculate a buffer of 1km to avoid the empty envelopes
@@ -99,10 +93,15 @@ def dist_start(itineraire,geodataframe):
     """    
 
 
-    #row = gpd.GeoDataFrame(itineraire, geometry = itineraire['start'].map(wkt.loads)) 
-    #gdf = gpd.GeoDataFrame(geodataframe, geometry = geodataframe['start_right'].map(wkt.loads)) 
+    #we change the geometry of the dataframes to their starting point
 
+
+    itineraire = gpd.GeoDataFrame(itineraire, geometry = itineraire['start'].map(wkt.loads)) 
+    geodataframe = gpd.GeoDataFrame(geodataframe, geometry = geodataframe['start_right'].map(wkt.loads)) 
+
+    #and use the geopanda's function to calculate the distance between the starting point
     geodataframe['start_distance'] = geodataframe.distance(itineraire)
+    
     return geodataframe
 
 
@@ -118,6 +117,11 @@ def max_distance(itineraire,geodataframe):
         geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraires for the given row
 
     """            
+
+    # we change the geometry of the dataframes to their itineraires
+    itineraire = gpd.GeoDataFrame(itineraire, geometry = itineraire['itineraire'].map(wkt.loads)) 
+    geodataframe = gpd.GeoDataFrame(geodataframe, geometry = geodataframe['itineraire_right'].map(wkt.loads))  
+
 
     #As there's a lot of points to compare we will vectorialize this calcul   
     row_points = itineraire.geometry.map(use_data.coord_lister).tolist()
@@ -146,8 +150,7 @@ def index(geodataframe,area):
         geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraires for the given row
 
     """            
-       
-    gdf = geodataframe
-    gdf['index']= gdf['start_distance'] * gdf['max_distance'] / area
-    gdf['index_with_jaacard'] = gdf['index'] * (1-gdf['jaacard'])
-    return gdf
+
+    geodataframe['index']= geodataframe['start_distance'] * geodataframe['max_distance'] / area
+    geodataframe['index_with_jaacard'] = geodataframe['index'] * (1-geodataframe['jaacard'])
+    return geodataframe

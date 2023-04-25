@@ -43,8 +43,28 @@ def line_to_coord(linestring):
              
 
 def coord_lister(geom):
+    """
+    Return a list of coordenate of a given geometry
+
+    Args:
+        id {int}: a row of an geodataframe
+
+    """    
     coords = list(geom.coords)
     return (coords)
+
+
+def get_itineraire(id,geodataframe):
+    
+    """
+    Return a geodataframe containing  the intineraire of the given id
+
+    Args:
+        id {int}: a row of an geodataframe
+
+    """    
+    sample = geodataframe[geodataframe['id_simulation']==id]
+    return sample
 
 if __name__ == "__main__":
 
