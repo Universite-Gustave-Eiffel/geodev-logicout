@@ -121,9 +121,8 @@ def comparison(idA,idB,gdf):
                 dataB[12]+=float(row[21])
                 dataB[13]+=float(row[22])
     field_names = ['id','idA','idB','tps_min','distance_km','cout','CO_g','COV_g','NOX_g','NH3_g','PB_g','SO2_g','PS_g','CO2_g','N2O_g','CH4_g','cout_collectif']
-    with open('trajets_mutualises.csv', mode='w', newline='') as file:
+    with open('trajets_mutualises.csv', mode='a', newline='') as file:
         writer = csv.DictWriter(file,fieldnames=field_names)
-        writer.writeheader()
         writer.writerow(
             {'id': str(idA)+"_"+str(idB) ,
              'idA': idA ,
