@@ -36,7 +36,8 @@ def calcul_couts(traj,vehicule='VUL_12',v_type='GF',frigo=True,tps_moy='00:10:00
         'service': 'mapbox',
         'retour': True,
         'etapes': etapes,
-        "itineraire_key": mapbox_key
+        'itineraire_key': mapbox_key,
+        'heure_depart': '01/01/2000 00:00'
     }
 
     data = json.dumps(json_logicout)
