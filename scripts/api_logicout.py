@@ -25,7 +25,6 @@ def calcul_couts(traj,vehicule='VUL_12',v_type='GF',frigo=True,tps_moy='00:10:00
     etapes = []
     for point in traj:
         etapes.append( {"latitude": point[1], "longitude": point[0], "duree_livraison": tps_moy})
-    print(etapes)
     #Building the json used for the request
     json_logicout = {
         'key': logicout_key,

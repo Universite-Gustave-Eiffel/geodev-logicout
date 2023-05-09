@@ -15,7 +15,6 @@ def route_calculation(RouteA,RouteB):
         RouteB (Array): An array of coordinates /!\ Latitude THEN longitude
     """
     #We merge the two sets of coordinates together
-    print(RouteA,RouteB)
     merged_coord = np.append(RouteA,RouteB,axis=0)
     #Now we have to optimize this list of coordinates, i.e rearranging them in the right order to minimize the travel time and the distance,
     #starting with the 1st point from A, then going to the 1st point from B
@@ -56,7 +55,6 @@ def comparison(idA,idB,gdf):
     )
     #Computing the new path
     traj_mutu = route_calculation(trajA,trajB)
-    print("Le trajet mutualisé est "+str(traj_mutu))
     
     #We need to stock the data about the prodcuer A vehicle, since it will be the one who takes in charge both products
     V_info = []
@@ -150,6 +148,4 @@ if __name__ == "__main__":
     gdf = use_data.create_gdf(filename, 'itineraire')
     a,b,c = comparison(16316,11449,gdf)
     
-    print("Données sur le trajet mutualisé entre le n°"+str(b[0])+" et le n°"+str(c[0])+" :" + str(a)+"\n Données sur le trajet n°"+str(b[0])+": "+str(b)+"\n Données sur le trajet n°"+str(c[0])+" : "+str(c))
-
-    ###print(route_calculation(TestA,TestB))
+    #print("Données sur le trajet mutualisé entre le n°"+str(b[0])+" et le n°"+str(c[0])+" :" + str(a)+"\n Données sur le trajet n°"+str(b[0])+": "+str(b)+"\n Données sur le trajet n°"+str(c[0])+" : "+str(c))
