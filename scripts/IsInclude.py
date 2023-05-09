@@ -32,7 +32,7 @@ def IsIn_tournee_gdf(tournee, gdf, dist, type):
     gdf_IsInclude = cheflieu.sjoin(gdf2, predicate='contains', how='inner') # we join with lines from the simulations from before the manipulation
     
     # Step 2
-    gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['id_utilisateur_right']!=gdf_IsInclude['id_utilisateur_left']] # filter the users with the same ID
+    # gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['id_utilisateur_right']!=gdf_IsInclude['id_utilisateur_left']] # filter the users with the same ID
     gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['start_left']!=gdf_IsInclude['start_right']] # filter the users with the same starting point 
     gdf_IsInclude = gdf_IsInclude.drop(columns=['index_right']) # drop the column to do the jointure
 
