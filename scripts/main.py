@@ -16,10 +16,14 @@ with open('./data/raw/ranked_mutualisations.csv', mode='r') as file:
     empty_list=[]
     for row in reader:
         if(row[1]):
-            mutualisation.comparison(row[0],eval(row[1])[0][0],gdf)
+            print('xxxx')
+            print(int(row[0]) )
+            print(int(eval(row[1])[0][0]))
+            mutualisation.comparison(int(row[0]),int(eval(row[1])[0][0]),gdf)
+            print('bbbbbbb')
                
         
      
-print(empty_list)
+
 
 
