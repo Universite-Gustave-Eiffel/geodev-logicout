@@ -61,9 +61,29 @@ def comparison(idA,idB,gdf):
     traj_mutu = route_calculation(trajA,trajB)
     print("Le trajet mutualisé est "+str(traj_mutu))
     
-    
-    #Sending the new path to the logicout API
-    results = api_logicout.calcul_couts(traj_mutu)
+    #We need to stock the data about the prodcuer A vehicle, since it will be the one who takes in charge both products
+    V_info = []
+    with open('./data/raw/simulation.csv', mode='r') as file:
+        reader = csv.reader(file,delimiter=';')
+        #Ignore the header
+        next(reader)
+        for row in reader:
+            if int(row[0]) == idA:
+                V_info.append(row[4])   #id_vehicule (str)
+                V_info.append(row[9])   #tps_autres_activités (str)
+                V_info.append(float(row[10])/float(row[7])) #Total tps_arret / nb_pts_arret (float)
+                if 'frigorifique' in row[6]: #Frigo (boolean) --> True if the vehicle is refrigirated
+                    V_info.append(True)
+                else:
+                    V_info.append(False)
+                if 'Fourgonnette' in row[5]: #Type of vehicle (relative to its size) (str)
+                    V_info.append('FTTE')
+                elif 'Fourgon' in row[5]:
+                    V_info.append('F')
+                elif 'Grand fourgon' in row[5]:
+                    V_info.append('GF')
+    #Sending the new path to the logicout API with A's vehicule data, since he will carry the products
+    results = api_logicout.calcul_couts(traj_mutu,vehicule=V_info[0],tps_act=V_info[1],tps_moy=V_info[2],frigo=V_info[3],v_type=V_info[4])
     #Gathering the data from the two original paths
     #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
     dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0]
