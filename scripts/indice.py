@@ -39,7 +39,7 @@ def indice(A,B,dist_start,buffer):
     
     # Récupération de la liste des points de B
     linestringB = B['geometry']
-    print(linestringA)
+    
     # On découpe le linestring en plusieurs points
     
     pointsA = linestringA.apply(use_data.line_to_points).explode()
