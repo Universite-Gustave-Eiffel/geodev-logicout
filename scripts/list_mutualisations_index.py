@@ -18,6 +18,7 @@ aire = np.pi*radius_**2
 
 
 
+
 def calculate_mutualisations(geo_df,dist,buffer_hull,type):
     """
     Return a list containing a row for each itineraire in a geodataframe, with their ids, the ids of 

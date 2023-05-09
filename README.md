@@ -35,8 +35,11 @@ MAPBOX_KEY='my_key'
 
 # Instructions
 ## Preparation of the environement
-The dependencies used for the project are listed on the file `environment.yml`
-
+The dependencies used for the project are listed on the file `environment.yml`. 
+You can import it as follows :
+``` python
+conda env create -f environment.yml
+```
 ## Prepare the data
 Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored in the  `data/raw` folder).
 

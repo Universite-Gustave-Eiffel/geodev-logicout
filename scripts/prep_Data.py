@@ -26,7 +26,7 @@ def create_simulation_df(filename) :
 
     """   
     
-    df = pd.read_csv(root +"/data/raw/"+ filename,sep=';')
+    df = pd.read_csv(root +"/data/raw/"+ filename,sep=',')
 
     return df
 
