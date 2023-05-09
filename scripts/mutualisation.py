@@ -78,6 +78,8 @@ def comparison(idA,idB,gdf):
                     V_info.append('F')
                 elif 'Grand fourgon' in row[5]:
                     V_info.append('GF')
+                else:
+                    V_info.append('GF')
     print(V_info)
     #Sending the new path to the logicout API with A's vehicule data, since he will carry the products
     results = api_logicout.calcul_couts(traj_mutu,vehicule=V_info[0],tps_act=V_info[1],tps_moy=V_info[2],frigo=V_info[3],v_type=V_info[4])
