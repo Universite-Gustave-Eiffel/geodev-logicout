@@ -6,7 +6,7 @@ import use_data
 
 def IsIn_tournee_gdf(tournee, gdf, dist, type):
     """
-    Return a geodataframe containing all the intineraires mutualisables for an itineraire 
+    Return a geodataframe containing all the itineraires mutualisables for an itineraire 
     We take 3 steps:
     1 - Take all itineraires from geodataframe are within a buffer of 100km from the row respective cheflieu .
     2 - Verify if we taking a differente user
@@ -33,6 +33,7 @@ def IsIn_tournee_gdf(tournee, gdf, dist, type):
     
     # Step 2
     gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['id_utilisateur_right']!=gdf_IsInclude['id_utilisateur_left']] # filter the users with the same ID
+    gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['start_left']!=gdf_IsInclude['start_right']] # filter the users with the same starting point 
     gdf_IsInclude = gdf_IsInclude.drop(columns=['index_right']) # drop the column to do the jointure
 
     # Step 3
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     dist = 100000
 
-    tournee = gdf.iloc[[1]]
+    tournee = gdf.iloc[[473]]
 
     #print(IsIn_tournee_gdf(tournee, gdf, dist, 1).shape[0])
     #print(IsIn_tournee_gdf(tournee, gdf, dist, 2).shape[0])
