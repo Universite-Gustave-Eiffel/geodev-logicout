@@ -1,4 +1,4 @@
-import jacaard, use_data, IsInclude, indexes
+import use_data, IsInclude, indexes
 from shapely import wkt, hausdorff_distance
 import geopandas as gpd
 import csv
@@ -41,7 +41,7 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
 
         #we chech if the dataframe of the mutualisables itineraires isn't empty
         if (gdf.shape[0]>0):  
-            gdf = jacaard.jacaard_index(row, gdf,buffer_hull) # we apply the jaacard index
+            gdf = indexes.jacaard_index(row, gdf,buffer_hull) # we apply the jaacard index
 
             # we calculate the distance between their starting points and adjust the geodataframes
             gdf = indexes.dist_start(row,gdf) 
