@@ -1,12 +1,9 @@
-import pandas as pd
 import numpy as np
 from python_tsp.distances import great_circle_distance_matrix
 from python_tsp.exact import solve_tsp_dynamic_programming
 import api_logicout
-import geopandas as gpd
 import use_data
 import csv
-from shapely import wkt
 
 def route_calculation(RouteA,RouteB):
     """
