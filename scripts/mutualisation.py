@@ -82,7 +82,10 @@ def comparison(idA,idB,gdf):
                     V_info.append('GF')
     print(V_info)
     #Sending the new path to the logicout API with A's vehicule data, since he will carry the products
-    results = api_logicout.calcul_couts(traj_mutu,vehicule=V_info[0],tps_act=V_info[1],tps_moy=V_info[2],frigo=V_info[3],v_type=V_info[4])
+
+    results = {'parametres_vehicule': {'type_vehicule': 'Vehicule utilitaire frigorifique < 3,5 t', 'infos_vehicule': 'Grand fourgon diesel Euro 4', 'cout_vehicule_forfait': 0.0, 'cout_vehicule_km': 0.5759000000000001}, 'couts': {'total': 259.61049843333336, 'vehicule': 181.40216510000002, 'conduite': 50.708333333333336, 'livraison': 5.0, 'autres_activites': 22.5, 'autres_couts': 0.0}, 'temps_passe': {'total': 312.83333333333337, 'conduite': 202.83333333333334, 'livraison': 20.0, 'autre': 90.0}, 'kilometrage': 314.989, 'emissions': {'COV': 11.024615, 'CO2': 79981.376902, 'NH3': 0.3779868, 'CO': 118.120875, 'NOX': 261.755859, 'CH4': 0.0626505765659207, 'PB': 0.00131350413, 'PS': 12.8830501, 'N2O': 2.834901, 'SO2': 0.07559736}, 'cout_collectif': 5.883212963129608}
+    #results = api_logicout.calcul_couts(traj_mutu,vehicule=V_info[0],tps_act=V_info[1],tps_moy=V_info[2],frigo=V_info[3],v_type=V_info[4])
+
     #Gathering the data from the two original paths
     #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
     dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0]
