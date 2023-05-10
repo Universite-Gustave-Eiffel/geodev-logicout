@@ -156,11 +156,11 @@ if __name__ == "__main__":
 
     ###      Obtenir des comparaisons quantitatives      ###
 
-    single_incluson, double_inclusion = mutu(filename, dist)
-    type = 'Pas'
+    # single_incluson, double_inclusion = mutu(filename, dist)
+    # type = 'Pas'
 
-    # single_incluson, double_inclusion = mean_mutu(filename, dist)
-    # type = 'Mean'
+    single_incluson, double_inclusion = mean_mutu(filename, dist)
+    type = 'Mean'
 
     # single_incluson, double_inclusion = max_mutu(filename, dist)
     # type = 'Max'
@@ -168,6 +168,8 @@ if __name__ == "__main__":
     print(single_incluson)
     print(double_inclusion)
     print(histo_comparaison(single_incluson, double_inclusion, type))
+
+
 
 
 
