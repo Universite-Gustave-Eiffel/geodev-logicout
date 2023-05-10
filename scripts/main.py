@@ -14,6 +14,7 @@ with open('./data/raw/ranked_mutualisations.csv', mode='r') as file:
     reader = csv.reader(file,delimiter=',')
     next(reader)
     empty_list=[]
+    print(reader)
     for row in reader:
         if(row[1]):
             print('xxxx')
