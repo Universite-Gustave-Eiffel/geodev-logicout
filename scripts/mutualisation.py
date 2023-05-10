@@ -23,7 +23,7 @@ def route_calculation(RouteA,RouteB):
     #We're starting by computing the distance matrix
     distance_matrix = great_circle_distance_matrix(merged_coord)
     #We then modify the distance matrix to set the distance between A1 & B1 to zero, so that the algorithm is forced to put them one after the other
-    i = np.where(np.isclose(merged_coord, RouteB[0]))
+    i = np.where((merged_coord[:, 0] == RouteB[0, 0]) & (merged_coord[:, 1] == RouteB[0, 1]))[0][0]
     distance_matrix[0,i] = 0
     #Then we get the permutation list, which is containing the order in which we need to rearrange the indexes from all_coord
     #permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
