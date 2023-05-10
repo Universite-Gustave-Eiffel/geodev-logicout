@@ -40,7 +40,7 @@ def histo_comparaison(single_incluson, double_inclusion, type):
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_xlabel("km du rayon considéré")
     if type == 'Pas':
-        ax.set_ylabel("% de tournées n'ayant aucune tournées dans son rayon")
+        ax.set_ylabel("% de tournées mutualisables") # i.e. ayant au moins une tournée dans son buffer
     if type == 'Mean':
         ax.set_ylabel("nombre de tournées moyennes dans un rayon de X km")
     if type == 'Max':
@@ -70,7 +70,7 @@ def autolabel(rects, ax):
 
 
 
-def Pas_mutu(filename, dist):
+def mutu(filename, dist):
     gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     n = gdf.count()[0] # number of total rounds
     L1 = []
@@ -81,7 +81,7 @@ def Pas_mutu(filename, dist):
             for i in range(n):
                 tournee = gdf.iloc[[i]]
                 gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, d, j)
-                if gdf_IsInclude.count()[0] == 0:
+                if gdf_IsInclude.count()[0] != 0:
                     pas_mutu += 1
             if j == 1:
                 L1.append(int(pas_mutu * 100 / n))
@@ -91,7 +91,7 @@ def Pas_mutu(filename, dist):
 
 
 
-def Mean_mutu(filename, dist):
+def mean_mutu(filename, dist):
     gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     n = gdf.count()[0] # number of total rounds
     L1 = []
@@ -112,7 +112,7 @@ def Mean_mutu(filename, dist):
 
 
 
-def Max_mutu(filename, dist):
+def max_mutu(filename, dist):
     gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
     n = gdf.count()[0] # number of total rounds
     L1 = []
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     typeIsIn = [1, 2]
     dictType = {1:"simple", 2:"double"}
 
-    ###      Tracer les histogrammes      ###
+    ###      Tracer les histogrammes de base      ###
 
     # for file in filenames:
     #     for d in dist:
@@ -156,17 +156,20 @@ if __name__ == "__main__":
 
     ###      Obtenir des comparaisons quantitatives      ###
 
-    # single_incluson, double_inclusion = Pas_mutu(filename, dist)
+    # single_incluson, double_inclusion = mutu(filename, dist)
     # type = 'Pas'
 
-    # single_incluson, double_inclusion = Mean_mutu(filename, dist)
-    # type = 'Mean'
+    single_incluson, double_inclusion = mean_mutu(filename, dist)
+    type = 'Mean'
 
-    single_incluson, double_inclusion = Max_mutu(filename, dist)
-    type = 'Max'
+    # single_incluson, double_inclusion = max_mutu(filename, dist)
+    # type = 'Max'
 
     print(single_incluson)
     print(double_inclusion)
     print(histo_comparaison(single_incluson, double_inclusion, type))
+
+
+
 
 

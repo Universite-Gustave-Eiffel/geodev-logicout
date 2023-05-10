@@ -52,7 +52,7 @@ def create_utilisateurs_df(filename) :
 
     """   
 
-    df = pd.read_csv(root +"/data/raw/"+ filename,sep=';',encoding='cp1252')
+    df = pd.read_excel(root +"/data/raw/"+ filename)
 
     return df
     
@@ -73,7 +73,7 @@ def create_point_arret_df(filename) :
 
 
 #Creation and filtering of utilisateurs dataframe
-df_utilisateurs = create_utilisateurs_df('utilisateurs.csv')
+df_utilisateurs = create_utilisateurs_df('utilisateur 0603_Etudiants ENSG_nettoyé.xls')
 df_utilisateurs= df_utilisateurs[df_utilisateurs['prise en compte O/N ENSG']=='oui']
 
 #Creation of simulation dataframe and join with utilisateurs df
@@ -82,7 +82,7 @@ df_simulation_reel = df_simulation[df_simulation['type_simulation']=='reel']
 
 #Creation of point_arret dataframe and join with utilisateurs_simulations
 df_point_arret = create_point_arret_df('point_arret.csv')
-
+df_point_arret = df_point_arret.sort_values(by=['id','id_simulation','index'])
 
 def create_geodataframe(simulation,utilisateur,point_arret):
 
@@ -101,6 +101,7 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     # we make the first dataframes    
     df_utilisateurs_simulations =pd.merge(simulation,utilisateur, left_on='id_utilisateur', right_on='id',how='inner')
     df_simulations_arrets = pd.merge(point_arret,df_utilisateurs_simulations, left_on='id_simulation', right_on='id_x',how='inner')
+    df_simulations_arrets= df_simulations_arrets.sort_values(by=['id_simulation','index'])
     gdf_simulation_arrets= gpd.GeoDataFrame(df_simulations_arrets[['id_simulation','id_utilisateur']], geometry=gpd.points_from_xy(df_simulations_arrets.longitude, df_simulations_arrets.latitude))
 
     #join segments of lines

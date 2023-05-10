@@ -14,29 +14,29 @@ logicout_key = os.getenv('LOGICOUT_KEY')
 gmaps_key = os.getenv('GMAPS_KEY')
 mapbox_key = os.getenv('MAPBOX_SECRET_KEY')
 
-def calcul_couts(traj):
+def calcul_couts(traj,vehicule='VUL_12',v_type='GF',frigo=True,tps_moy='00:10:00',tps_act='00:00:00'):
     '''
         traj: Coordinates Array
         
         Takes an array of coordinates and create the json request for the Logicout API, then sends it and display the characteristics of 
     '''
+    #NB : The defaults values are chosen to match the worst case possible, so the script will give a pessimistic answer, but it cannot be worse in reality.
     #Parsing the coordinates array to build the json
     etapes = []
     for point in traj:
-        etapes.append( {"latitude": point[0], "longitude": point[1], "duree_livraison": "00:10:00"})
-    print(etapes)
+        etapes.append( {"latitude": point[1], "longitude": point[0], "duree_livraison": tps_moy})
     #Building the json used for the request
     json_logicout = {
         'key': logicout_key,
-        'id_vehicule': 'VUL_12',
-        'type_vul': 'GF',
-        'frigorifique': True,
-        'duree_autres_activites': '01:30:00',
-        'heure_depart': '15/03/2025 15:48',
+        'id_vehicule': vehicule,
+        'type_vul': v_type,
+        'frigorifique': frigo,
+        'duree_autres_activites': tps_act,
         'service': 'mapbox',
-        'retour': False,
+        'retour': True,
         'etapes': etapes,
-        "itineraire_key": mapbox_key
+        'itineraire_key': mapbox_key,
+        'heure_depart': '01/01/2000 00:00'
     }
 
     data = json.dumps(json_logicout)
@@ -51,6 +51,6 @@ def calcul_couts(traj):
     #print(json_response)
     logging.info(str(date.today())+str(json_response))
     
+    return(json_response)
         
-test = [(48.8566,2.3522), (46.5468,1.6639)]
-calcul_couts(test)
+
