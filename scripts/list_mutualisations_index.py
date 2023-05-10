@@ -5,6 +5,7 @@ import csv
 import os
 import numpy as np
 import warnings
+from tqdm import tqdm
 warnings.filterwarnings('ignore')
 
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
@@ -12,7 +13,7 @@ root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to 
 
 radius_=100000
 buffer_hull_= 1000
-type_= 1
+type_= 2
 geo_dataframe_logicout = use_data.create_gdf('simulations_reel_gdf.csv','cheflieu')
 aire = np.pi*radius_**2
 
@@ -34,7 +35,7 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
 
 
     mutualisations=[]
-    for i in range (geo_df.shape[0]):
+    for i in tqdm(range(geo_df.shape[0])):
    
         row = geo_df.iloc[[i]] # we take the current itineraire
         
