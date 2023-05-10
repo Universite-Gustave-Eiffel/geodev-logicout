@@ -146,7 +146,7 @@ if __name__ == "__main__":
     typeIsIn = [1, 2]
     dictType = {1:"simple", 2:"double"}
 
-    ###      Tracer les histogrammes      ###
+    ###      Tracer les histogrammes de base      ###
 
     # for file in filenames:
     #     for d in dist:
@@ -168,5 +168,6 @@ if __name__ == "__main__":
     print(single_incluson)
     print(double_inclusion)
     print(histo_comparaison(single_incluson, double_inclusion, type))
+
 
 
