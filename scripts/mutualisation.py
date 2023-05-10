@@ -1,6 +1,7 @@
 import numpy as np
 from python_tsp.distances import great_circle_distance_matrix
 from python_tsp.exact import solve_tsp_dynamic_programming
+from python_tsp.heuristics import solve_tsp_simulated_annealing
 import api_logicout
 import use_data
 import csv
@@ -22,10 +23,12 @@ def route_calculation(RouteA,RouteB):
     #We're starting by computing the distance matrix
     distance_matrix = great_circle_distance_matrix(merged_coord)
     #We then modify the distance matrix to set the distance between A1 & B1 to zero, so that the algorithm is forced to put them one after the other
-    i = np.where(np.isclose(merged_coord, RouteB[0]))
+    i = np.where((merged_coord[:, 0] == RouteB[0, 0]) & (merged_coord[:, 1] == RouteB[0, 1]))[0][0]
     distance_matrix[0,i] = 0
     #Then we get the permutation list, which is containing the order in which we need to rearrange the indexes from all_coord
-    permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
+    #permutation, distance = solve_tsp_dynamic_programming(distance_matrix)
+    permutation, distance = solve_tsp_simulated_annealing(distance_matrix)
+
     #We then rearrange the all_coord array into a new array
     rearranged_coord = np.zeros(np.shape(merged_coord))
     for i in range(len(permutation)):
@@ -151,6 +154,6 @@ if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
     gdf = use_data.create_gdf(filename, 'itineraire')
-    a,b,c = comparison(16316,11449,gdf)
+    a,b,c = comparison(473,17099,gdf)
     
     #print("Données sur le trajet mutualisé entre le n°"+str(b[0])+" et le n°"+str(c[0])+" :" + str(a)+"\n Données sur le trajet n°"+str(b[0])+": "+str(b)+"\n Données sur le trajet n°"+str(c[0])+" : "+str(c))

@@ -48,7 +48,8 @@ This process will create the files `data/raw/simulations_gdf.csv` and `data/raw/
 
 For the purpose of this study we will only use the file `simulations_reel_gdf.csv` , that contains the selected data of 1096 simulations made in the Logicout application.
 
-
+Once you have this file, you have to create the file 'ranked_simulation.csv'. In this file you will find all the indexes for each tour, sorted in ascending order according to the general index.
+To obtain this file, you have to run the script named 'list_mutualisation_index.py'.
 
 
 # Licence 
