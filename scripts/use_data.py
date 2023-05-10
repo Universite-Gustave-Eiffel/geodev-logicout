@@ -16,7 +16,7 @@ def create_gdf(filename, ColumnsGeometry) :
     root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
     dirname = "/data/raw/" # relative path to the gitignore directory - the function on the file _dataframes_gpd.py is adapted to find the relative path of this directory
     df = pd.read_csv(root + dirname+ filename,sep=';')
-    geometry = df[ColumnGeometry].map(wkt.loads)
+    geometry = df[ColumnsGeometry].map(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs = 'EPSG:2154')
     return gdf
 
