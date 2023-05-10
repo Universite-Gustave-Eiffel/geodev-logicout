@@ -53,5 +53,4 @@ def calcul_couts(traj,vehicule='VUL_12',v_type='GF',frigo=True,tps_moy='00:10:00
     
     return(json_response)
         
-#test = [(48.8566,2.3522), (46.5468,1.6639)]
-#calcul_couts(test)
+
