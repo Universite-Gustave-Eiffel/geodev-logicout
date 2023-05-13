@@ -272,8 +272,6 @@ def plot_itineraires_convex_hull(a,b):
     it2_points = it2.geometry.map(use_data.coord_lister).tolist() #save the points of the itinerary b for the highlight
     
 
-    
-
     #convex hulls
     it1 = gpd.GeoDataFrame(it1,geometry=it1.geometry.buffer(1000).convex_hull)
     it2 = gpd.GeoDataFrame(it2,geometry=it2.geometry.buffer(1000).convex_hull) 
@@ -297,7 +295,6 @@ def plot_itineraires_convex_hull(a,b):
    
     #Steps of B
     data = {'coors':it2_points[0]}
-    print(data)
     df = pd.DataFrame.from_dict(data)
     df['geometry'] = df.coors.apply(Point)
     gdf = gpd.GeoDataFrame(df,crs = 'EPSG:2154')
