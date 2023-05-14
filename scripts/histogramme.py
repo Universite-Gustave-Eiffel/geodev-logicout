@@ -15,7 +15,7 @@ def histo(filename, dictFilename, dist, type, dictType):
         nbrMutu = gdf_IsInclude.count()[0]
         A.append(nbrMutu)
 
-    # affichage de l'histogramme
+    # Histogramme display
     plt.hist(A,bins=20,color="blue",edgecolor="gray",label="histogramme")
     plt.title('Histogramme du nombre de mutualisations possibles : tournées '+dictFilename[filename])
     plt.xlabel('Nombre de tournées dans un rayon de '+str(dist*1e-3)+' km pour des utilisateurs différents ('+dictType[type]+' inclusion)')
@@ -40,7 +40,7 @@ def histo_comparaison(single_incluson, double_inclusion, type):
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_xlabel("km du rayon considéré")
     if type == 'Pas':
-        ax.set_ylabel("% de tournées mutualisables") # i.e. ayant au moins une tournée dans son buffer
+        ax.set_ylabel("% de tournées mutualisables") # i.e. having at least one tour in its buffer
     if type == 'Mean':
         ax.set_ylabel("nombre de tournées moyennes dans un rayon de X km")
     if type == 'Max':
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     typeIsIn = [1, 2]
     dictType = {1:"simple", 2:"double"}
 
-    ###      Tracer les histogrammes      ###
+    ###      Plots histograms       ###
 
     # for file in filenames:
     #     for d in dist:
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     #             print(histo(file, dictFilename, d, type, dictType))
 
 
-    ###      Obtenir des comparaisons quantitatives      ###
+    ###      Get quantitative comparisons      ###
 
     single_incluson, double_inclusion = mutu(filename, dist)
     type = 'Pas'
