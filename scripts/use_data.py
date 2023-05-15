@@ -5,6 +5,9 @@ from shapely import wkt
 
 from shapely.geometry import Point, LineString, shape
 
+
+
+
 def create_gdf(filename, ColumnsGeometry) :
     """
     Create geodataframes from the real simulation files
@@ -77,6 +80,11 @@ def get_itineraire(id,geodataframe):
     """    
     sample = geodataframe[geodataframe['id_simulation']==id]
     return sample
+
+
+
+
+
 
 if __name__ == "__main__":
 
