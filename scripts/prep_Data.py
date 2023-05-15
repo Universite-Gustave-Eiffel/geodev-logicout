@@ -108,9 +108,8 @@ def create_geodataframe(simulation,utilisateur,point_arret):
 
     """  
     #We set the progress bar to work with pandas
-    tqdm.pandas()
-
     print('start')
+ 
     #we make the first dataframes
      
     #join between utilisateurs and simulations    
