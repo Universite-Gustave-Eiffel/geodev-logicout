@@ -116,7 +116,7 @@ def plot_mutualisations(id, dataframe,**parameters):
 
     Args:
         id (int): Id number of the the chosen itinerary
-        dataframe (geopandas Geodataframe): name of file in the directory ../data/raw
+        dataframe (geodataframe): name of file in the directory ../data/raw
         parameters (dict): dictionary with the parameters for the algorithm to run
 
     Returns:
@@ -144,11 +144,11 @@ def plot_mutualisations_non_zero_index(id, dataframe,**parameters):
 
     Args:
         id (int): Id number of the the chosen itinerary
-        dataframe (geopandas Geodataframe): name of file in the directory ../data/raw
+        dataframe (geodataframe): name of file in the directory ../data/raw
         parameters (dict): dictionary with the parameters for the algorithm to run
 
     Returns:
-        best_mutualisations (geopandas Geodataframe): Dataframe with their best ranked simulations
+        best_mutualisations (geodataframe): Dataframe with their best ranked simulations
         m(folium map): map of those simulations
 
     """
@@ -182,7 +182,7 @@ def plot_mutualisations_zero_index(id, dataframe,**parameters):
         parameters (dict): dictionary with the parameters for the algorithm to run
 
     Returns:
-        best_mutualisations (geopandas Geodataframe): Dataframe with their best ranked simulations
+        best_mutualisations (geodataframe): Dataframe with their best ranked simulations
         m(folium map): map of those simulations
 
     """    
@@ -218,6 +218,12 @@ def map_gdf_mutualisables(sample, dataframe):
     Args:
         a (Geopanda's gdf): geodataframe of the itinerary a
         b (Geopanda's gdf): geodataframe of the itinerary b
+
+    Returns:
+
+        m(folium map): map of chosen sample
+        gdf (geodataframe): Geodataframe with all the simulations candidates
+        
     """    
 
     new_cmap = rand_cmap(100, type='bright', first_color_black=False, last_color_black=False, verbose=True)
@@ -240,13 +246,17 @@ def map_gdf_mutualisables(sample, dataframe):
 
 def plot_itineraires_and_mutualisation(a,b):
     """
-    Returns two folium maps:
-    m1: original itineraries
-    m2: mutualised itineraries
+    Returns two folium maps containing two itineraries and their mutualisation:
+
 
     Args:
         a (Geopanda's gdf): geodataframe of the itinerary a
         b (Geopanda's gdf): geodataframe of the itinerary b
+
+    
+    Returns:
+        m1 (folium map): original itineraries
+        m2 (folium map): mutualised itineraries
     """
     
     # loads the GDF with the geometry of their itineraries
@@ -318,6 +328,9 @@ def plot_itineraires_convex_hull(a,b):
     Args:
         a (Geopanda's gdf): geodataframe of the itinerary a
         b (Geopanda's gdf): geodataframe of the itinerary b
+
+    Returns:
+        m (folium map): map of the convex hulls
     """
 
     #line of a
