@@ -31,6 +31,9 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
         dist {int}: buffer size in meters´
         buffer_hull {int}: size of the buffer applied to the lines before generating the convex hull
         type {int}: type of verification of itineraires within buffer : 1->simple 2->double
+
+    Returns:
+        mutualisations (list) : List containg all ranked mutualisations for all rows of an dataframe
     """    
 
 
