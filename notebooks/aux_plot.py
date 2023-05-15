@@ -88,6 +88,19 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
     return random_colormap
 
 def mutualisations_with_index(sample_itineraire,geodataframe,radius,buffer_hull,type,area):
+    """Return all mutualisations for a given itinerary
+
+    Args:
+        sample_itineraire (_type_): _description_
+        geodataframe (_type_): _description_
+        radius (_type_): _description_
+        buffer_hull (_type_): _description_
+        type (_type_): _description_
+        area (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """    
 
     sample_itineraire = use_data.get_itineraire(sample_itineraire,geodataframe)
     gdf = IsInclude.IsIn_tournee_gdf(sample_itineraire,geodataframe,radius,type) #verify all the mutualisables itineraires
@@ -99,6 +112,16 @@ def mutualisations_with_index(sample_itineraire,geodataframe,radius,buffer_hull,
     return gdf
 
 def plot_mutualisations(id, dataframe,**parameters):
+    """Auxiliary function to plot all the possible mutualisations according to the parameters
+
+    Args:
+        id (int): Id number of the the chosen itinerary
+        dataframe (geopandas Geodataframe): name of file in the directory ../data/raw
+        parameters (dict): dictionary with the parameters for the algorithm to run
+
+    Returns:
+        _type_: _description_
+    """    
     sample = use_data.get_itineraire(id,dataframe)
     sample_gdf = mutualisations_with_index(id, dataframe,**parameters)
     best_mutualisations = sample_gdf[['id_simulation_right','index','index_with_jaacard']].sort_values(by='index_with_jaacard').head()
@@ -117,6 +140,18 @@ def plot_mutualisations(id, dataframe,**parameters):
     return best_mutualisations,m
 
 def plot_mutualisations_non_zero_index(id, dataframe,**parameters):
+    """Returns an folium map and a dataframe containing the mutualisations
+
+    Args:
+        id (int): Id number of the the chosen itinerary
+        dataframe (geopandas Geodataframe): name of file in the directory ../data/raw
+        parameters (dict): dictionary with the parameters for the algorithm to run
+
+    Returns:
+        best_mutualisations (geopandas Geodataframe): Dataframe with their best ranked simulations
+        m(folium map): map of those simulations
+
+    """
     sample = use_data.get_itineraire(id,dataframe)
     sample_gdf = mutualisations_with_index(id, dataframe,**parameters)
     sample_gdf=sample_gdf[sample_gdf['index_with_jaacard']!=0]
@@ -139,6 +174,19 @@ def plot_mutualisations_non_zero_index(id, dataframe,**parameters):
 
 def plot_mutualisations_zero_index(id, dataframe,**parameters):
 
+    """Returns an folium map and a dataframe containing the mutualisations with the index of distance = 0 
+
+    Args:
+        id (int): Id number of the the chosen itinerary
+        dataframe (geopandas Geodataframe): name of file in the directory ../data/raw
+        parameters (dict): dictionary with the parameters for the algorithm to run
+
+    Returns:
+        best_mutualisations (geopandas Geodataframe): Dataframe with their best ranked simulations
+        m(folium map): map of those simulations
+
+    """    
+
     sample = use_data.get_itineraire(id,dataframe)
     sample_gdf = mutualisations_with_index(id, dataframe,**parameters)
     best_mutualisations = sample_gdf[['id_simulation_right','index','index_with_jaacard']].sort_values(by='index_with_jaacard').head()
@@ -160,7 +208,18 @@ def plot_mutualisations_zero_index(id, dataframe,**parameters):
     return best_mutualisations,m
 
 def map_gdf_mutualisables(sample, dataframe):
-    #this function will return a map and a geodataframe consisting of all mutualisables itineraires for the given sample
+
+    """
+    Returns a folium map and a geodataframe with all mutualisable itineraries for a given sample:
+    
+    sample: original itinerary
+    dataframe: mutualised itineraries
+
+    Args:
+        a (Geopanda's gdf): geodataframe of the itinerary a
+        b (Geopanda's gdf): geodataframe of the itinerary b
+    """    
+
     new_cmap = rand_cmap(100, type='bright', first_color_black=False, last_color_black=False, verbose=True)
     gdf=gpd.GeoDataFrame(sample,geometry=sample['start'].map(wkt.loads))
     m= gdf.explore(tiles='CartoDB positron',style_kwds=dict(fill=False, stroke=True,weight=4,color='black'))
@@ -185,7 +244,7 @@ def plot_itineraires_and_mutualisation(a,b):
     m1: original itineraries
     m2: mutualised itineraries
 
-  Args:
+    Args:
         a (Geopanda's gdf): geodataframe of the itinerary a
         b (Geopanda's gdf): geodataframe of the itinerary b
     """
@@ -256,7 +315,7 @@ def plot_itineraires_convex_hull(a,b):
     """
     Returns a folium maps with the itineraries a and b and their convex hulls
 
-  Args:
+    Args:
         a (Geopanda's gdf): geodataframe of the itinerary a
         b (Geopanda's gdf): geodataframe of the itinerary b
     """
