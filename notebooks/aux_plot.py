@@ -87,23 +87,23 @@ def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=F
 
     return random_colormap
 
-def mutualisations_with_index(sample_itineraire,geodataframe,radius,buffer_hull,type,area):
+def mutualisations_with_index(sample_itineraire,geodataframe,dist,buffer_hull,type,area):
     """Return all mutualisations for a given itinerary
 
     Args:
-        sample_itineraire (_type_): _description_
-        geodataframe (_type_): _description_
-        radius (_type_): _description_
-        buffer_hull (_type_): _description_
-        type (_type_): _description_
-        area (_type_): _description_
+        sample_itineraire (one line of a geodataframe): One row of the studied geodataframe
+        geodataframe (geodataframe): _description_
+        dist (int): buffer size in meters
+        type (int) 1 => single buffer inclusion | 2 => double buffer inclusion
+        buffer_hull (int): _description_
+        area (float): _description_
 
     Returns:
-        _type_: _description_
+        gdf (geodataframe): Geodataframe containing all mutualisations and their index
     """    
 
     sample_itineraire = use_data.get_itineraire(sample_itineraire,geodataframe)
-    gdf = IsInclude.IsIn_tournee_gdf(sample_itineraire,geodataframe,radius,type) #verify all the mutualisables itineraires
+    gdf = IsInclude.IsIn_tournee_gdf(sample_itineraire,geodataframe,dist,type) #verify all the mutualisables itineraires
     gdf = indexes.jacaard_index(sample_itineraire, gdf,buffer_hull) # we apply the jaacard index
     gdf = indexes.dist_start(sample_itineraire,gdf) # we calculate the distance between their starting points
     gdf = indexes.max_distance(sample_itineraire,gdf) # We calculate the maximum distance between the itineraire and his mutualisables counterparts
@@ -112,7 +112,8 @@ def mutualisations_with_index(sample_itineraire,geodataframe,radius,buffer_hull,
     return gdf
 
 def plot_mutualisations(id, dataframe,**parameters):
-    """Auxiliary function to plot all the possible mutualisations according to the parameters
+    """
+    Returns an folium map and a dataframe containing the mutualisations
 
     Args:
         id (int): Id number of the the chosen itinerary
@@ -120,8 +121,10 @@ def plot_mutualisations(id, dataframe,**parameters):
         parameters (dict): dictionary with the parameters for the algorithm to run
 
     Returns:
-        _type_: _description_
-    """    
+        best_mutualisations (geodataframe): Dataframe with their best ranked simulations
+        m(folium map): map of those simulations
+
+    """  
     sample = use_data.get_itineraire(id,dataframe)
     sample_gdf = mutualisations_with_index(id, dataframe,**parameters)
     best_mutualisations = sample_gdf[['id_simulation_right','index','index_with_jaacard']].sort_values(by='index_with_jaacard').head()
@@ -140,7 +143,8 @@ def plot_mutualisations(id, dataframe,**parameters):
     return best_mutualisations,m
 
 def plot_mutualisations_non_zero_index(id, dataframe,**parameters):
-    """Returns an folium map and a dataframe containing the mutualisations
+    """
+    Returns an folium map and a dataframe containing the mutualisations with the index =! 0
 
     Args:
         id (int): Id number of the the chosen itinerary
