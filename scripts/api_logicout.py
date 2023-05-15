@@ -52,5 +52,3 @@ def calcul_couts(traj,vehicule='VUL_12',v_type='GF',frigo=True,tps_moy='00:10:00
     logging.info(str(date.today())+str(json_response))
     
     return(json_response)
-        
-

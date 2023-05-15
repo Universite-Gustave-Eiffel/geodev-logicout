@@ -14,7 +14,7 @@ root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to 
 # we charge the shapes
 df_communes = gpd.read_file(root + "/data/assets/COMMUNE.shp")  # Layer IGN
 df_cheflieu = gpd.read_file(root + "/data/assets/CHFLIEU_COMMUNE.shp")  # Layer IGN
-df_france = gpd.read_file(root + "/data/assets/FRANCE.shp")  # Layer cree a partir du shape REGION de lIGN
+df_france = gpd.read_file(root + "/data/assets/FRANCE.shp")  # Layer created from IGN's REGION shape / Créé a partir du shape REGION de lIGN
 df_france = gpd.GeoDataFrame(df_france, geometry='geometry',crs="EPSG:2154")
 
 def create_simulation_df(filename) :
