@@ -159,11 +159,11 @@ if __name__ == "__main__":
     # single_incluson, double_inclusion = mutu(filename, dist)
     # type = 'Pas'
 
-    single_incluson, double_inclusion = mean_mutu(filename, dist)
-    type = 'Mean'
+    # single_incluson, double_inclusion = mean_mutu(filename, dist)
+    # type = 'Mean'
 
-    # single_incluson, double_inclusion = max_mutu(filename, dist)
-    # type = 'Max'
+    single_incluson, double_inclusion = max_mutu(filename, dist)
+    type = 'Max'
 
     print(single_incluson)
     print(double_inclusion)
