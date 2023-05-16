@@ -23,6 +23,7 @@ def route_calculation(RouteA,RouteB):
     #We're starting by computing the distance matrix
     distance_matrix = great_circle_distance_matrix(merged_coord)
     #We then modify the distance matrix to set the distance between A1 & B1 to zero, so that the algorithm is forced to put them one after the other
+    #i = np.where(np.isclose(merged_coord, RouteB[0]))
     i = np.where((merged_coord[:, 0] == RouteB[0][0]) & (merged_coord[:, 1] == RouteB[0][1]))[0][0]
     distance_matrix[0,i] = 0
     #Then we get the permutation list, which is containing the order in which we need to rearrange the indexes from all_coord
@@ -58,6 +59,7 @@ def comparison(idA,idB,gdf):
     )
     #Computing the new path
     traj_mutu = route_calculation(trajA,trajB)
+    print('Le trajet mutualisé est'+str(traj_mutu))
     
     #We need to stock the data about the prodcuer A vehicle, since it will be the one who takes in charge both products
     V_info = []
@@ -67,6 +69,7 @@ def comparison(idA,idB,gdf):
         next(reader)
         for row in reader:
             if int(row[0]) == idA:
+                CostA = float(row[21])
                 V_info.append(row[4])   #id_vehicule (str)
                 V_info.append(row[9])   #tps_autres_activités (str)
                 temp = float(row[10])/float(row[7]) #Total tps_arret / nb_pts_arret (float)
@@ -83,16 +86,19 @@ def comparison(idA,idB,gdf):
                     V_info.append('GF')
                 else:
                     V_info.append('GF')
+            if int(row[0]) == idB:
+                CostB = float(row[21])
     print(V_info)
+    print(CostA,CostB)
     #Sending the new path to the logicout API with A's vehicule data, since he will carry the products
 
     results = {'parametres_vehicule': {'type_vehicule': 'Vehicule utilitaire frigorifique < 3,5 t', 'infos_vehicule': 'Grand fourgon diesel Euro 4', 'cout_vehicule_forfait': 0.0, 'cout_vehicule_km': 0.5759000000000001}, 'couts': {'total': 259.61049843333336, 'vehicule': 181.40216510000002, 'conduite': 50.708333333333336, 'livraison': 5.0, 'autres_activites': 22.5, 'autres_couts': 0.0}, 'temps_passe': {'total': 312.83333333333337, 'conduite': 202.83333333333334, 'livraison': 20.0, 'autre': 90.0}, 'kilometrage': 314.989, 'emissions': {'COV': 11.024615, 'CO2': 79981.376902, 'NH3': 0.3779868, 'CO': 118.120875, 'NOX': 261.755859, 'CH4': 0.0626505765659207, 'PB': 0.00131350413, 'PS': 12.8830501, 'N2O': 2.834901, 'SO2': 0.07559736}, 'cout_collectif': 5.883212963129608}
-    #results = api_logicout.calcul_couts(traj_mutu,vehicule=V_info[0],tps_act=V_info[1],tps_moy=V_info[2],frigo=V_info[3],v_type=V_info[4])
+    results = api_logicout.calcul_couts(traj_mutu,vehicule=V_info[0],tps_act=V_info[1],tps_moy=V_info[2],frigo=V_info[3],v_type=V_info[4])
 
     #Gathering the data from the two original paths
     #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
-    dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    dataB = [idB,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    dataB = [idB,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     with open('./data/raw/trajet.csv', mode='r') as file:
         reader = csv.reader(file)
         #Ignore the header
@@ -112,6 +118,7 @@ def comparison(idA,idB,gdf):
                 dataA[11]+=float(row[20])
                 dataA[12]+=float(row[21])
                 dataA[13]+=float(row[22])
+                dataA[14] = CostA
             if int(row[1]) == idB:
                 dataB[1]+=float(row[6])
                 dataB[2]+=float(row[5])
@@ -126,6 +133,7 @@ def comparison(idA,idB,gdf):
                 dataB[11]+=float(row[20])
                 dataB[12]+=float(row[21])
                 dataB[13]+=float(row[22])
+                dataB[14] = CostB
     field_names = ['id','idA','idB','tps_min','distance_km','cout','CO_g','COV_g','NOX_g','NH3_g','PB_g','SO2_g','PS_g','CO2_g','N2O_g','CH4_g','cout_collectif']
     with open('trajets_mutualises.csv', mode='a', newline='') as file:
         writer = csv.DictWriter(file,fieldnames=field_names)
@@ -147,13 +155,37 @@ def comparison(idA,idB,gdf):
              'N2O_g': results['emissions']['N2O'] ,
              'CH4_g': results['emissions']['CH4'],
              'cout_collectif': results['cout_collectif']}
-        )     
+        )
+    with open('gains.csv', mode='a', newline='') as file:
+        writer = csv.DictWriter(file,fieldnames=field_names)
+        writer.writerow(
+            {'id': str(idA)+"_"+str(idB) ,
+             'idA': idA ,
+             'idB': idB ,
+             'tps_min': (dataA[1]+dataB[1])-results['temps_passe']['total'] ,
+             'distance_km': (dataA[2]+dataB[2])+results['kilometrage'] ,
+             'cout': (CostA+CostB)-results['couts']['total'] ,
+             'CO_g': (dataA[3]+dataB[3])-results['emissions']['CO'] ,
+             'COV_g': (dataA[4]+dataB[4])-results['emissions']['COV'] ,
+             'NOX_g': (dataA[5]+dataB[5])-results['emissions']['NOX'] ,
+             'NH3_g': (dataA[6]+dataB[6])-results['emissions']['NH3'] ,
+             'PB_g': (dataA[7]+dataB[7])-results['emissions']['PB'] ,
+             'SO2_g': (dataA[8]+dataB[8])-results['emissions']['SO2'] ,
+             'PS_g': (dataA[9]+dataB[9])-results['emissions']['PS'] ,
+             'CO2_g': (dataA[10]+dataB[10])-results['emissions']['CO2'] ,
+             'N2O_g': (dataA[11]+dataB[11])-results['emissions']['N2O'] ,
+             'CH4_g': (dataA[12]+dataB[12])-results['emissions']['CH4'],
+             'cout_collectif': (dataA[13]+dataB[13])-results['cout_collectif']}
+        )         
     return(results,dataA,dataB)
 
 if __name__ == "__main__":
 
     filename = "simulations_reel_gdf.csv"
     gdf = use_data.create_gdf(filename, 'itineraire')
-    a,b,c = comparison(473,17099,gdf)
-    
-    #print("Données sur le trajet mutualisé entre le n°"+str(b[0])+" et le n°"+str(c[0])+" :" + str(a)+"\n Données sur le trajet n°"+str(b[0])+": "+str(b)+"\n Données sur le trajet n°"+str(c[0])+" : "+str(c))
+    a,b,c = comparison(3474,8680,gdf)
+    print("\n\n\nGains pour le trajet mutualisé entre le trajet n°"+str(b[0])+" et le n°"+str(c[0])+" :\n"
+          +"Temps gagné (en min) : "+ str(b[1]+c[1]-a['temps_passe']['total'])+"\n"
+          +"Kilométrage gagné : "+str(b[2]+c[2]-a['kilometrage'])+"\n"
+          +"Gain économique (en €) : "+str(b[14]+c[14]-a['couts']['total'])+"\n"
+          +"Gain CO2 (en g) : "+str(b[10]+c[10]-a['emissions']['CO2'])+"\n\n\n")
