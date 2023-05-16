@@ -12,11 +12,17 @@ def IsIn_tournee_gdf(tournee, gdf, dist, type):
     2 - Verify if we taking a differente user
     if type == 2:
         3 - Verify if the row are within a 100km each one of those itineraires filtered in the step 2
+    
     Args:
         tournee {geopandas Geodataframe line}: a row of an geodataframe
         gdf {geopandas Geodataframe}: Geodataframe of the given file name in the directory ../data/raw
         dist {int}: buffer size in meters
         type {int}: 1 => single buffer inclusion | 2 => double buffer inclusion
+
+    Output : 
+        gdf_IsInclude {geopandas Geodataframe}: geodataframe containing all the itineraires mutualisables for an itineraire
+        or 
+        error message {geopandas Geodataframe}: if the 'type' argument is not properly filled in
     """
     # Step 1
     geometry = tournee['cheflieu'].map(wkt.loads)
@@ -32,7 +38,10 @@ def IsIn_tournee_gdf(tournee, gdf, dist, type):
     gdf_IsInclude = cheflieu.sjoin(gdf2, predicate='contains', how='inner') # we join with lines from the simulations from before the manipulation
     
     # Step 2
+    # former mutualisation constraint
     # gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['id_utilisateur_right']!=gdf_IsInclude['id_utilisateur_left']] # filter the users with the same ID
+    
+    # new mutualisation constraint
     gdf_IsInclude = gdf_IsInclude[gdf_IsInclude['start_left']!=gdf_IsInclude['start_right']] # filter the users with the same starting point 
     gdf_IsInclude = gdf_IsInclude.drop(columns=['index_right']) # drop the column to do the jointure
 
@@ -69,10 +78,10 @@ if __name__ == "__main__":
     gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe of the selected csv file
     dist = 100000
 
-    tournee = gdf.iloc[[10]]
+    tournee = gdf.iloc[[10]] # choice of a sample in the detaframe
 
-    print(IsIn_tournee_gdf(tournee, gdf, dist, 1).shape[0])
-    print(IsIn_tournee_gdf(tournee, gdf, dist, 2).shape[0])
+    print(IsIn_tournee_gdf(tournee, gdf, dist, 1).shape[0]) # number of samples that can be shared with the selected sample for simple inclusion
+    print(IsIn_tournee_gdf(tournee, gdf, dist, 2).shape[0]) # number of samples that can be shared with the selected sample for double inclusion
 
-    print(gdf[gdf['id_simulation']==1131])
+    print(gdf[gdf['id_simulation']==1131]) # allows you to obtain a sample according to your 'id_simulation'
 
