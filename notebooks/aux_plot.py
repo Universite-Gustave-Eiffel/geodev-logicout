@@ -15,7 +15,7 @@ import ast
 
 
 # Generate random colormap using the module created by https://github.com/delestro/rand_cmap
-def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=False, verbose=True):
+def rand_cmap(nlabels, type='bright', first_color_black=True, last_color_black=False, verbose=False):
     from itertools import cycle # to generate random colors
     """
     Creates a random colormap to be used together with matplotlib. Useful for segmentation tasks
