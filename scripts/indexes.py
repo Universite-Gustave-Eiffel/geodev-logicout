@@ -12,23 +12,18 @@ This module contains the function to generate the different kinds of indexes tha
 
 """
 
-def jacaard_index(row,geodataframe,buffer_convex_hull):
-
-
-
+def jacaard_index(row,geodataframe,buffer_hull):
     """
-    Return a geodataframe containing all the intineraires mutualisables for an itineraire 
-    We take 3 steps:
-    1 - Take all itineraires from geodataframe are within a buffer of 100km from the row respective cheflieu .
-    2 - Verify if we taking a differente user
-    3 - Verify if the row are within a 100km each one of those itineraires filtered in the step 2
-
-
+    Calculate the Jaacard's index for all mutualisations of a given itinerary from a dataframe
+    
     Args:
         row {geopandas Geodataframe line}: a row of an geodataframe
         geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraires for the given row
         buffer_hull {int}: size of the buffer applied to the lines before generating the convex hull
 
+    Returns:
+
+        geo_df_envelop {geopandas Geodataframe}: Geodataframe containing the above index
     """    
     
     # we change the geometries to 'itineraire'
@@ -36,11 +31,11 @@ def jacaard_index(row,geodataframe,buffer_convex_hull):
     row=gpd.GeoDataFrame(row, geometry=row['itineraire'].map(wkt.loads),crs = 'EPSG:2154') 
 
     # we calculate a buffer of 1km to avoid the empty envelopes
-    row['buffer'] = row.geometry.buffer(buffer_convex_hull) 
+    row['buffer'] = row.geometry.buffer(buffer_hull) 
 
     #then we create the envelope and set it as the geometry of the gdf
     row=gpd.GeoDataFrame(row['id_simulation'], geometry=row['buffer'].convex_hull,crs = 'EPSG:2154') 
-    geo_df_envelop['buffer']=geo_df_envelop.geometry.buffer(buffer_convex_hull) 
+    geo_df_envelop['buffer']=geo_df_envelop.geometry.buffer(buffer_hull) 
     geo_df_envelop=gpd.GeoDataFrame(geo_df_envelop, geometry=geo_df_envelop['buffer'].convex_hull,crs = 'EPSG:2154')
 
     #we backup those geometries before the joins
@@ -79,16 +74,19 @@ def jacaard_index(row,geodataframe,buffer_convex_hull):
 
 
 
-def dist_start(itineraire,geodataframe):
+def dist_start(itinerary,geodataframe):
 
     """
     Return one geodataframe with an additional column containing the distance between the starting point of each element
-    and the starting point of a given itineraire 
+    and the starting point of a given itinerary 
     
     Args:
-        itineraire {geopandas Geodataframe line}: a row of an geodataframe
-        geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraires for the given row
+        itinerary {geopandas Geodataframe line}: a row of an geodataframe
+        geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraries for the given row
         buffer_hull {int}: size of the buffer applied to the lines before generating the convex hull
+    
+    Returns:
+        geo_df_envelop {geopandas Geodataframe}: Geodataframe containing the above index
 
     """    
 
@@ -96,11 +94,11 @@ def dist_start(itineraire,geodataframe):
     #we change the geometry of the dataframes to their starting point
 
 
-    itineraire = gpd.GeoDataFrame(itineraire, geometry = itineraire['start'].map(wkt.loads)) 
+    itinerary = gpd.GeoDataFrame(itinerary, geometry = itinerary['start'].map(wkt.loads)) 
     geodataframe = gpd.GeoDataFrame(geodataframe, geometry = geodataframe['start_right'].map(wkt.loads)) 
 
     #and use the geopanda's function to calculate the distance between the starting point
-    geodataframe['start_distance'] = geodataframe.distance(itineraire)
+    geodataframe['start_distance'] = geodataframe.distance(itinerary)
     
     return geodataframe
 

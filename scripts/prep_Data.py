@@ -8,13 +8,13 @@ from shapely.geometry import Point, LineString, shape
 # Execute once to generate the csv files inside the folder "data/raw"
 
 
-root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
+root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the project's directory
 
 
-# we charge the shapes
+# we charge the shapefiles
 df_communes = gpd.read_file(root + "/data/assets/COMMUNE.shp")  # Layer IGN
 df_cheflieu = gpd.read_file(root + "/data/assets/CHFLIEU_COMMUNE.shp")  # Layer IGN
-df_france = gpd.read_file(root + "/data/assets/FRANCE.shp")  # Layer created from IGN's REGION shape / Créé a partir du shape REGION de lIGN
+df_france = gpd.read_file(root + "/data/assets/FRANCE.shp")  # Layer created from an IGN Shapefile
 df_france = gpd.GeoDataFrame(df_france, geometry='geometry',crs="EPSG:2154")
 
 def create_simulation_df(filename) :
@@ -25,6 +25,7 @@ def create_simulation_df(filename) :
         path_trajet (string): name of file in the directory ../data/raw
 
     """   
+
     
     df = pd.read_csv(root +"/data/raw/"+ filename,sep=',')
 
@@ -35,7 +36,10 @@ def create_trajet_df(filename) :
     Create geodataframes from the trajet files
 
     Args:
-        path_trajet (string): name of file in the directory ../data/raw
+        path_trajet (string): name of file in the directory ../data/
+        
+    Returns:
+        df (dataframe): panda's dataframe containing all data from the input file
 
     """   
     
@@ -45,10 +49,13 @@ def create_trajet_df(filename) :
 
 def create_utilisateurs_df(filename) :
     """
-    Create geodataframes from the utilisateurs files
+    Create geodataframes from the "utilisateurs" file
 
     Args:
         path_trajet (string): name of file in the directory ../data/raw
+
+    Returns:
+        df (dataframe): panda's dataframe containing all data from the input file
 
     """   
 
@@ -59,12 +66,15 @@ def create_utilisateurs_df(filename) :
 def create_point_arret_df(filename) : 
     
     """
-    Create geodataframes from the point_arret files
+    Create geodataframes from the "point_arret" files
 
     Args:
         path_trajet (string): name of file in the directory ../data/raw
 
-    """   
+    Returns:
+        df (dataframe): panda's dataframe containing all data from the input file
+
+    """ 
 
     df = pd.read_csv(root + "/data/raw/"+ filename,sep=',')
 
@@ -76,11 +86,11 @@ def create_point_arret_df(filename) :
 df_utilisateurs = create_utilisateurs_df('utilisateur 0603_Etudiants ENSG_nettoyé.xls')
 df_utilisateurs= df_utilisateurs[df_utilisateurs['prise en compte O/N ENSG']=='oui']
 
-#Creation of simulation dataframe and join with utilisateurs df
+#Creation of simulation dataframe
 df_simulation = create_simulation_df('simulation.csv')
 df_simulation_reel = df_simulation[df_simulation['type_simulation']=='reel']
 
-#Creation of point_arret dataframe and join with utilisateurs_simulations
+#Creation of point_arret dataframe
 df_point_arret = create_point_arret_df('point_arret.csv')
 df_point_arret = df_point_arret.sort_values(by=['id','id_simulation','index'])
 
@@ -92,14 +102,19 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     Args:
         simulation, utilisateur, point_arret  (string): name of files in the directory ../data/raw
 
+    Returns:
+        geo_df_cheflieu (geodataframe): panda's dataframe containing all data from the input file
 
-
-    """   
+    """  
 
 
     print('start')
-    # we make the first dataframes    
+    # we make the first dataframes
+     
+    #join between utilisateurs and simulations    
     df_utilisateurs_simulations =pd.merge(simulation,utilisateur, left_on='id_utilisateur', right_on='id',how='inner')
+
+    #join with arrets and make a dataframe
     df_simulations_arrets = pd.merge(point_arret,df_utilisateurs_simulations, left_on='id_simulation', right_on='id_x',how='inner')
     df_simulations_arrets= df_simulations_arrets.sort_values(by=['id_simulation','index'])
     gdf_simulation_arrets= gpd.GeoDataFrame(df_simulations_arrets[['id_simulation','id_utilisateur']], geometry=gpd.points_from_xy(df_simulations_arrets.longitude, df_simulations_arrets.latitude))
@@ -121,11 +136,8 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     geo_df_commune = geo_df.sjoin(df_communes,how='left')
     geo_df_commune = geo_df_commune.drop(columns=['index_right']) #Dropping the column to join effectively
 
-    
     geo_df_chef_lieu = geo_df_commune.merge(df_cheflieu,left_on='ID', right_on='ID_COM') # proerty based join with the id of the 'cheflieu'
     geo_df_chef_lieu = geo_df_chef_lieu.rename(columns ={'geometry_x':'itineraire','geometry_y':'cheflieu'})
-
-    
     geo_df_chef_lieu = gpd.GeoDataFrame(geo_df_chef_lieu,geometry='itineraire')
 
     # Joining the chef_lieu dataframe onto the france dataframe
@@ -136,6 +148,7 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     geo_df_chef_lieu = geo_df_chef_lieu.drop(columns=['index_right','ID_right','ID_left','NOM_M','NOM','INSEE_REG'])        
     print(geo_df_chef_lieu.head())
     print(geo_df_chef_lieu.geometry)
+
     #Returning the final dataframe
     return geo_df_chef_lieu
 
