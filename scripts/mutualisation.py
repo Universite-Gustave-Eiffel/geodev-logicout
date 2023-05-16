@@ -5,6 +5,8 @@ from python_tsp.heuristics import solve_tsp_simulated_annealing
 import api_logicout
 import use_data
 import csv
+import os
+root = os.path.join(os.path.dirname( __file__ ), os.pardir)
 
 def route_calculation(RouteA,RouteB):
     """
@@ -63,7 +65,7 @@ def comparison(idA,idB,gdf):
     
     #We need to stock the data about the prodcuer A vehicle, since it will be the one who takes in charge both products
     V_info = []
-    with open('./data/raw/simulation.csv', mode='r') as file:
+    with open(root+'/data/raw/simulation.csv', mode='r') as file:
         reader = csv.reader(file,delimiter=';')
         #Ignore the header
         next(reader)
@@ -99,7 +101,7 @@ def comparison(idA,idB,gdf):
     #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
     dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     dataB = [idB,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    with open('./data/raw/trajet.csv', mode='r') as file:
+    with open(root +'/data/raw/trajet.csv', mode='r') as file:
         reader = csv.reader(file)
         #Ignore the header
         next(reader)
