@@ -5,28 +5,19 @@ import IsInclude
 
 
 
-def histo(filename, dictFilename, dist, type, dictType):
-    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
-    n = gdf.count()[0] # number of total rounds
-    A = []
-    for i in range(n):
-        tournee = gdf.iloc[[i]]
-        gdf_IsInclude = IsInclude.IsIn_tournee_gdf(tournee, gdf, dist, type)
-        nbrMutu = gdf_IsInclude.count()[0]
-        A.append(nbrMutu)
+def histo_comparaison(single_incluson, double_inclusion, typeHisto):
 
-    # affichage de l'histogramme
-    plt.hist(A,bins=20,color="blue",edgecolor="gray",label="histogramme")
-    plt.title('Histogramme du nombre de mutualisations possibles : tournées '+dictFilename[filename])
-    plt.xlabel('Nombre de tournées dans un rayon de '+str(dist*1e-3)+' km pour des utilisateurs différents ('+dictType[type]+' inclusion)')
-    plt.ylabel('Fréquence')
-    plt.rcParams['svg.fonttype'] = 'none'
-    plt.show()
-    return 'Histogramme [ '+dictFilename[filename]+' '+dictType[type]+' '+str(dist*1e-3)+' ] tracé !'
+    """
+        Allows you to plot a histogram comparing the mutualisation of single or double inclusion rounds according to the radius 
+    
+    Args:
+        single_incluson {List}: list of id's sample that can be mutualised in single inclusion
+        double_incluson {List}: list of id's sample that can be mutualised in double inclusion
+        typeHisto {String}: '
 
-
-
-def histo_comparaison(single_incluson, double_inclusion, type):
+    Output : 
+        graphic window containing the histogram and a confirmation of the histogram plot as a String 
+    """
 
     labels = ['50 km', '100 km', '150 km']
 
@@ -39,11 +30,11 @@ def histo_comparaison(single_incluson, double_inclusion, type):
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_xlabel("km du rayon considéré")
-    if type == 'Pas':
-        ax.set_ylabel("% de tournées mutualisables") # i.e. ayant au moins une tournée dans son buffer
-    if type == 'Mean':
+    if typeHisto == 'Mutu':
+        ax.set_ylabel("% de tournées mutualisables") # i.e. with at least one sample in its buffer
+    if typeHisto == 'Mean':
         ax.set_ylabel("nombre de tournées moyennes dans un rayon de X km")
-    if type == 'Max':
+    if typeHisto == 'Max':
         ax.set_ylabel("nombre maximum de tournées dans un rayon de X km")
     ax.set_title('Comparaison entre une simple et une double inclusion, pour des rayons différents')
     ax.set_xticks(x)
@@ -71,7 +62,7 @@ def autolabel(rects, ax):
 
 
 def mutu(filename, dist):
-    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
+    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe of the selected csv file
     n = gdf.count()[0] # number of total rounds
     L1 = []
     L2 = []
@@ -92,7 +83,7 @@ def mutu(filename, dist):
 
 
 def mean_mutu(filename, dist):
-    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
+    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe of the selected csv file
     n = gdf.count()[0] # number of total rounds
     L1 = []
     L2 = []
@@ -113,7 +104,7 @@ def mean_mutu(filename, dist):
 
 
 def max_mutu(filename, dist):
-    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe du fichier csv choisi
+    gdf = use_data.create_gdf(filename, 'cheflieu') # dataframe of the selected csv file
     n = gdf.count()[0] # number of total rounds
     L1 = []
     L2 = []
@@ -139,37 +130,42 @@ def max_mutu(filename, dist):
 
 
 if __name__ == "__main__":
-    filenames = ["simulations_reel_gdf.csv", "simulations_gdf.csv"]
+
+    # choice to work only with actual samples
     filename = "simulations_reel_gdf.csv"
-    dictFilename = {"simulations_reel_gdf.csv": "reelles", "simulations_gdf.csv": "quelconques"}
+
+    # test distances for the buffer radius
     dist = [50e3, 100e3, 150e3]
-    typeIsIn = [1, 2]
-    dictType = {1:"simple", 2:"double"}
-
-    ###      Tracer les histogrammes de base      ###
-
-    # for file in filenames:
-    #     for d in dist:
-    #         for type in typeIsIn:
-    #             print(histo(file, dictFilename, d, type, dictType))
 
 
-    ###      Obtenir des comparaisons quantitatives      ###
+    ###      Obtaining quantitative comparisons      ###
 
-    # single_incluson, double_inclusion = mutu(filename, dist)
-    # type = 'Pas'
+    # You just have to enter one of the 3 parameters proposed in the python console to obtain a histogram, allowing you to visualise the selected parameter:
+    # - average number of mutualisable tours
+    # - maximum number of mutualisable tours
+    # - percentage of mutualisable tours).
 
-    # single_incluson, double_inclusion = mean_mutu(filename, dist)
-    # type = 'Mean'
+    print("Choose from the 3 possible histogram types:\n- 'Mean' to obtain a histogram of the AVERAGE number of samples that can be shared\n- 'Max' to obtain a histogram of the MAXIMUM number of samples that can be shared\n- 'Mutu' to obtain a histogram of the percentage of samples that can be shared.")
+    typeHisto = input()
 
-    single_incluson, double_inclusion = max_mutu(filename, dist)
-    type = 'Max'
+    if typeHisto == 'Mutu':
+        single_incluson, double_inclusion = mutu(filename, dist)
+        print(single_incluson)
+        print(double_inclusion)
+        print(histo_comparaison(single_incluson, double_inclusion, typeHisto))
 
-    print(single_incluson)
-    print(double_inclusion)
-    print(histo_comparaison(single_incluson, double_inclusion, type))
+    elif typeHisto == 'Mean':
+        single_incluson, double_inclusion = mean_mutu(filename, dist)
+        print(single_incluson)
+        print(double_inclusion)
+        print(histo_comparaison(single_incluson, double_inclusion, typeHisto))
 
-
-
-
+    elif typeHisto == 'Max':
+        single_incluson, double_inclusion = max_mutu(filename, dist)
+        print(single_incluson)
+        print(double_inclusion)
+        print(histo_comparaison(single_incluson, double_inclusion, typeHisto))
+    
+    else :
+        print("Erreur de saisi du type d'histrogramme")
 
