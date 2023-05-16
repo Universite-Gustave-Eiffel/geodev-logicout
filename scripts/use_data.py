@@ -24,6 +24,12 @@ def create_gdf(filename, ColumnsGeometry) :
 def line_to_points(line):
     """
     Découpe de la linestring en liste de points
+    Splitting the linestring into a list of points
+    
+    Args:
+        line (Linestring)
+    Output : 
+        List of Points (Point)
     """
     return [Point(xy) for xy in line.coords]
 
@@ -31,6 +37,12 @@ def line_to_points(line):
 def line_to_coord(linestring):
     """
     Récupère les coordonnées des points de la linestring, et les ajoutent dans un array qu'il retourne en sortie
+    Retrieves the coordinates of the points from the linestring, and adds them to an array that it returns as output
+    
+    Args:
+        linestring (Linestring)
+    Output : 
+        List of number (List<floats>)
     """
     C = []
     list_points = linestring.apply(line_to_points).explode()
