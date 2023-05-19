@@ -9,12 +9,13 @@ reduce economic and societal costs.
 Data is extracted from the [Logicout platform](https://www.logicout.fr/couts/) for research purposes only. 
 They are not open for confidentiality reasons but you can contact the [SPLOTT laboratory](https://splott.univ-gustave-eiffel.fr/contacter-le-labo) about them.
 
-4 files are expected in the `data/raw` folder:
+5 files are expected in the `data/raw` folder:
 
 - point_arret.csv : departures and delivery points
 - simulation.csv : unique simulations entered in the platform
 - trajet.csv : trips between two stops
 - usage.csv : metadata on the platform usage (for data quality control)
+- utilisateur 0603_Etudiants ENSG_nettoyé.xls: filtered user database for the purpose of this study
 
 To use the API present in the code, you will need:
 
@@ -41,16 +42,22 @@ You can import it as follows :
 conda env create -f environment.yml
 ```
 ## Prepare the data
-Run once the file prep_data.py to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored in the  `data/raw` folder).
+Run once the file 'prep_data.py' to create two CSVs containing all the data necessary to run the algorithm to find the mutualisations (those files will be stored in the  `data/raw` folder).
 
 This script will take as input the files .csv from logicout's database and make spatial and attributaires joins between tables to filter the data by entry, user and localization. 
 This process will create the files `data/raw/simulations_gdf.csv` and `data/raw/simulations_reel_gdf.csv`
 
-For the purpose of this study we will only use the file `simulations_reel_gdf.csv` , that contains the selected data of 1096 simulations made in the Logicout application.
+For the purpose of this study we will only use the file `simulations_reel_gdf.csv` , that contains the selected data of 1097 simulations made in the Logicout application.
 
-Once you have this file, you have to create the file 'ranked_simulation.csv'. In this file you will find all the indexes for each tour, sorted in ascending order according to the general index.
+Once you have this file, you have to create the file 'ranked_mutualisations.csv'. In this file you will find all the indexes for each tour, sorted in ascending order according to the general index.
 To obtain this file, you have to run the script named 'list_mutualisation_index.py'.
 
+## Evaluating the mutualizations
+
+The script 'mutualisation.py' contains a function, "comparison", that takes two routes and make a request to Logicout to calucl the costs of an optimized mutualized itinerary
+The informations are then stored in the file "gains.csv"
+
+The 'main.py' script loop through the file "ranked_simulation.csv" and run the function "comparison" for all the lines of the file 'ranked_mutualisations.csv', having as parameter an itinerary and its better mutualization. Note it comes commented by default to avoid an unintended execution, since it will make thousand request for the API and will possibly incur costs in terms of quota.
 
 # Licence 
 
