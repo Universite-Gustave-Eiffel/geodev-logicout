@@ -19,7 +19,6 @@ root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to 
 if __name__ == "__main__":
 
     print(root)
-    root = os.getcwd()
     with open(root+'/trajets_mutualises.csv', mode='r') as file:
         
         calculated=pd.read_csv(file, sep=",",usecols=[0])
