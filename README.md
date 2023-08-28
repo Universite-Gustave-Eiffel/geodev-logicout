@@ -56,14 +56,17 @@ Run the script named 'list_mutualisation_index.py' to generate the 'ranked_mutua
 
 ## Evaluating the mutualizations
 
-The script 'mutualisation.py' contains a function, "comparison", that takes two routes and make a request to Logicout to calucl the costs of an optimized mutualized itinerary
+The script 'mutualisation.py' contains the 'comparison' function that takes two routes and make a request to the Logicout API to compute the costs of an itinerary.
 The informations are then stored in the file "gains.csv"
 
-The 'main.py' script loop through the file "ranked_simulation.csv" and run the function "comparison" for all the lines of the file 'ranked_mutualisations.csv', having as parameter an itinerary and its better mutualization. Note it comes commented by default to avoid an unintended execution, since it will make thousand request for the API and will possibly incur costs in terms of quota.
+The 'main.py' script loop through the file "ranked_simulation.csv" and run the function "comparison" for all the lines of the file 'ranked_mutualisations.csv', having as parameter an itinerary and its better mutualization (the one ranked 0). 
+Note it comes commented by default to avoid an unintended execution, since it will make thousand request for the API and will possibly incur costs in terms of quota.
 
 ## Notebooks
 
-During the development of the project we use jupyter notebooks to show preliminary results and discuss technical issues. They are contained in the notebooks directory and are self-explanatory.
+During the development of the project, we use jupyter notebooks to show preliminary results and discuss technical issues. 
+They are contained in the notebooks directory and are self-explanatory.
+We keep them to show how some scripts work and and showcase some peculiar points.
 
 # Licence 
 
