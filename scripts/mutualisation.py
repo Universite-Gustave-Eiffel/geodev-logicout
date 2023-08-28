@@ -6,7 +6,10 @@ import api_logicout
 import use_data
 import csv
 import os
+
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)
+gains_file = 'data/output/gains.csv'
+pooled_travels = 'data/output/trajets_mutualises.csv'
 
 def route_calculation(RouteA,RouteB):
     """
@@ -101,6 +104,7 @@ def comparison(idA,idB,gdf):
     #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
     dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     dataB = [idB,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
     with open(root +'/data/raw/trajet.csv', mode='r') as file:
         reader = csv.reader(file)
         #Ignore the header
@@ -136,9 +140,16 @@ def comparison(idA,idB,gdf):
                 dataB[12]+=float(row[21])
                 dataB[13]+=float(row[22])
                 dataB[14] = CostB
+
     field_names = ['id','idA','idB','tps_min','distance_km','cout','CO_g','COV_g','NOX_g','NH3_g','PB_g','SO2_g','PS_g','CO2_g','N2O_g','CH4_g','cout_collectif']
-    with open('trajets_mutualises.csv', mode='a', newline='') as file:
+    
+    file_exist  =  os.path.exists(pooled_travels) # test if file already exist
+    with open(pooled_travels, mode='a', newline='') as file:
         writer = csv.DictWriter(file,fieldnames=field_names)
+
+        if not file_exist : # print csv header if new file, otherwise do nothing
+            writer.writeheader()
+     
         writer.writerow(
             {'id': str(idA)+"_"+str(idB) ,
              'idA': idA ,
@@ -158,8 +169,16 @@ def comparison(idA,idB,gdf):
              'CH4_g': results['emissions']['CH4'],
              'cout_collectif': results['cout_collectif']}
         )
-    with open('gains.csv', mode='a', newline='') as file:
+
+
+    gains_file_exist  =  os.path.exists(gains_file) # test if file already exist
+
+    with open(gains_file, mode='a', newline='') as file:
         writer = csv.DictWriter(file,fieldnames=field_names)
+
+        if not gains_file_exist : # print csv header if new file, otherwise do nothing
+            writer.writeheader()
+            
         writer.writerow(
             {'id': str(idA)+"_"+str(idB) ,
              'idA': idA ,

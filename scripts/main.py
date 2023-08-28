@@ -18,15 +18,23 @@ root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to 
 
 if __name__ == "__main__":
 
-    print(root)
     root = os.getcwd()
-    with open(root+'/trajets_mutualises.csv', mode='r') as file:
-        
-        calculated=pd.read_csv(file, sep=",",usecols=[0])
-        calculated=calculated["id"].tolist()
-        print(calculated)
 
-    with open(root+'/data/raw/ranked_mutualisations.csv', mode='r') as file:
+    gdf = use_data.create_gdf('simulations_reel_gdf.csv', 'itineraire')
+
+    pooled_travels = root+'data/results/trajets_mutualises.csv'
+
+    if os.path.exists(pooled_travels):
+    
+        with open(pooled_travels, mode='r') as file:
+            
+            calculated = pd.read_csv(file, sep=",",usecols=[0])
+            calculated = calculated["id"].tolist()
+
+    else:
+        calculated = []
+
+    with open(root+'/data/raw/ranked_mutualisations_trunc.csv', mode='r') as file:
         reader = csv.reader(file,delimiter=',')
         next(reader)
         for row in reader:
@@ -37,7 +45,7 @@ if __name__ == "__main__":
                     print(row_id + " have already been calculated.")
                 else:
                     print(row_id) #delete this line
-                    #mutualisation.comparison(int(row[0]),int(eval(row[1])[0][0]),gdf)
+                    mutualisation.comparison(int(row[0]),int(eval(row[1])[0][0]),gdf)
 
      
 
