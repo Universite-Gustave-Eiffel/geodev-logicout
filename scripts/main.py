@@ -14,38 +14,50 @@ from tqdm import tqdm
 #________________________________________________________________________________
 
 
-root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
+#root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
 
+block_size = 2 # number of travels to compare
+skipped_row  = 0
 if __name__ == "__main__":
 
     root = os.getcwd()
 
     gdf = use_data.create_gdf('simulations_reel_gdf.csv', 'itineraire')
 
-    pooled_travels = root+'data/results/trajets_mutualises.csv'
+    pooled_travels = root+'/data/output/trajets_mutualises.csv'
 
+    # get already computed pooled travels
+    computed_travels = []
     if os.path.exists(pooled_travels):
-    
+        #print("open pooled travels")    
         with open(pooled_travels, mode='r') as file:
-            
-            calculated = pd.read_csv(file, sep=",",usecols=[0])
-            calculated = calculated["id"].tolist()
+            computed_travels = pd.read_csv(file, sep=",",usecols=[0])
+            computed_travels = computed_travels["id"].tolist()  
 
-    else:
-        calculated = []
-
-    with open(root+'/data/raw/ranked_mutualisations_trunc.csv', mode='r') as file:
+    with open(root+'/data/raw/ranked_mutualisations.csv', mode='r') as file:
         reader = csv.reader(file,delimiter=',')
         next(reader)
+        row_counter = 0
+
         for row in reader:
             if (len(row) >0 and row[1]!=""):
 
                 row_id=str(row[0])+"_" + str(int(eval(row[1])[0][0]))
-                if(row_id in calculated):
-                    print(row_id + " have already been calculated.")
+                if(row_id in computed_travels):
+                    #print(f"{row_id} pooled travel have been already computed.")
+                    skipped_row += 1
                 else:
-                    print(row_id) #delete this line
-                    mutualisation.comparison(int(row[0]),int(eval(row[1])[0][0]),gdf)
+                    if row_counter < block_size:
+                        print(f"Computing {row_id}")
+                        #print(row_id) #delete this line
+                        mutualisation.comparison(int(row[0]),int(eval(row[1])[0][0]),gdf)
+                        row_counter +=1
+                        #print(row_counter)
+                    else:
+                        #print("Stopping loop")
+                        break
+                        
+        print(f"{row_counter} pooled travels have been computed and compared in this run. {row_counter + skipped_row} travels in total")
 
      
 
