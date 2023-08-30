@@ -8,6 +8,8 @@ import csv
 import os
 
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)
+
+# Path to output files
 gains_file = 'data/output/gains.csv'
 pooled_travels = 'data/output/trajets_mutualises.csv'
 
@@ -19,6 +21,8 @@ def route_calculation(RouteA,RouteB):
     Args:
         RouteA (Array): An array of coordinates /!\ Latitude THEN longitude
         RouteB (Array): An array of coordinates /!\ Latitude THEN longitude
+    
+    Returns the new path as a Numpy ndarray
     """
     #We merge the two sets of coordinates together
     merged_coord = np.append(RouteA,RouteB,axis=0)
@@ -41,7 +45,7 @@ def route_calculation(RouteA,RouteB):
         rearranged_coord[i] = merged_coord[permutation[i]]
     #We just have to put back the first point of A at the end.
     path = rearranged_coord
-    
+
     return(path)
 
 def comparison(idA,idB,gdf):
@@ -52,7 +56,14 @@ def comparison(idA,idB,gdf):
         idA (int): The index of the first route(A)
         idB (int): The index of the second route(B)
         gdf (geodataframe): A gdf containing data on all the routes (created from simulation_reel_gdf.csv)
+    
+    Writes in trajets_mutualises.csv the pooled travels and in gains.csv, 
+    the difference between the sum of all emissions and cost of the two original travels
+    and thoses of the pooled travel.
+
+    Returns the emissions and costs of the pooled travel and of the two original travels
     """
+
     #Getting the array containing the coordinates of the two routes
     gdf['itineraire'] = gdf.geometry.to_crs(4326)
     

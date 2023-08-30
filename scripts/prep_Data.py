@@ -18,81 +18,16 @@ df_cheflieu = gpd.read_file(root + "/data/assets/CHFLIEU_COMMUNE.shp")  # Layer 
 df_france = gpd.read_file(root + "/data/assets/FRANCE.shp")  # Layer created from an IGN Shapefile
 df_france = gpd.GeoDataFrame(df_france, geometry='geometry',crs="EPSG:2154")
 
-def create_simulation_df(filename) :
-    """
-    Create geodataframes from the simulation files
-
-    Args:
-        path_trajet (string): name of file in the directory ../data/raw
-
-    """   
-
-    
-    df = pd.read_csv(root +"/data/raw/"+ filename,sep=';')
-
-    return df
-
-def create_trajet_df(filename) :
-    """
-    Create geodataframes from the trajet files
-
-    Args:
-        path_trajet (string): name of file in the directory ../data/
-        
-    Returns:
-        df (dataframe): panda's dataframe containing all data from the input file
-
-    """   
-    
-    df = pd.read_csv(root +"/data/raw/"+ filename,sep=',')
-
-    return df
-
-def create_utilisateurs_df(filename) :
-    """
-    Create geodataframes from the "utilisateurs" file
-
-    Args:
-        path_trajet (string): name of file in the directory ../data/raw
-
-    Returns:
-        df (dataframe): panda's dataframe containing all data from the input file
-
-    """   
-
-    df = pd.read_excel(root +"/data/raw/"+ filename)
-
-    return df
-    
-def create_point_arret_df(filename) : 
-    
-    """
-    Create geodataframes from the "point_arret" files
-
-    Args:
-        path_trajet (string): name of file in the directory ../data/raw
-
-    Returns:
-        df (dataframe): panda's dataframe containing all data from the input file
-
-    """ 
-
-    df = pd.read_csv(root + "/data/raw/"+ filename,sep=',')
-
-    return df
-
-
-
 #Creation and filtering of utilisateurs dataframe
-df_utilisateurs = create_utilisateurs_df('utilisateur 0603_Etudiants ENSG_nettoyé.xls')
-df_utilisateurs= df_utilisateurs[df_utilisateurs['prise en compte O/N ENSG']=='oui']
+df_utilisateurs = pd.read_excel(root +"/data/raw/utilisateur 0603_Etudiants ENSG_nettoyé.xls")
+df_utilisateurs = df_utilisateurs[df_utilisateurs['prise en compte O/N ENSG']=='oui']
 
 #Creation of simulation dataframe
-df_simulation = create_simulation_df('simulation.csv')
+df_simulation = pd.read_csv(root +"/data/raw/simulation.csv", sep = ";")
 df_simulation_reel = df_simulation[df_simulation['type_simulation']=='reel']
 
 #Creation of point_arret dataframe
-df_point_arret = create_point_arret_df('point_arret.csv')
+df_point_arret = pd.read_csv(root + "/data/raw/point_arret.csv", sep = ",")
 df_point_arret = df_point_arret.sort_values(by=['id','id_simulation','index'])
 
 def create_geodataframe(simulation,utilisateur,point_arret):
@@ -108,19 +43,23 @@ def create_geodataframe(simulation,utilisateur,point_arret):
 
     """  
     #We set the progress bar to work with pandas
-    print('start')
+    print('Starting Geodataframe creation')
  
     #we make the first dataframes
      
     #join between utilisateurs and simulations    
     print('joining tables ...')
-    df_utilisateurs_simulations =pd.merge(simulation,utilisateur, left_on='id_utilisateur', right_on='id',how='inner')
+    df_utilisateurs_simulations = pd.merge(
+        simulation,utilisateur, 
+        left_on='id_utilisateur', 
+        right_on='id',
+        how='inner')
 
     #join with arrets and make a dataframe
     
     df_simulations_arrets = pd.merge(point_arret,df_utilisateurs_simulations, left_on='id_simulation', right_on='id_x',how='inner')
-    df_simulations_arrets= df_simulations_arrets.sort_values(by=['id_simulation','index'])
-    gdf_simulation_arrets= gpd.GeoDataFrame(df_simulations_arrets[['id_simulation','id_utilisateur']], geometry=gpd.points_from_xy(df_simulations_arrets.longitude, df_simulations_arrets.latitude))
+    df_simulations_arrets = df_simulations_arrets.sort_values(by=['id_simulation','index'])
+    gdf_simulation_arrets = gpd.GeoDataFrame(df_simulations_arrets[['id_simulation','id_utilisateur']], geometry=gpd.points_from_xy(df_simulations_arrets.longitude, df_simulations_arrets.latitude))
 
   
     #join segments of lines
@@ -162,7 +101,7 @@ def create_geodataframe(simulation,utilisateur,point_arret):
     return geo_df_chef_lieu
 
 
-
+# Store data 
 simulations_to_csv = create_geodataframe(df_simulation,df_utilisateurs,df_point_arret)
 simulations_reels_to_csv = create_geodataframe(df_simulation_reel,df_utilisateurs,df_point_arret)
 simulations_to_csv.to_csv(root + "/data/raw/" + "simulations_gdf.csv",sep=';', index=False)

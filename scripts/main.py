@@ -7,17 +7,20 @@ from tqdm import tqdm
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #
+#   This script will compute pooled delivery travels and compare to non pooled travels.
+#    Change the block_size variable to compute more or less travels by runs.
+# 
 #   Attention : Running this script will request the LOGICOUT API 
 #   1 time per row in the database, for the best ranked itinerary to mutualise
-#
-#   The code is commented to ensure that this doesn't happens by chance
-#________________________________________________________________________________
+#   
+#   Please fill the LOGICOUT_KEY in a text file named .env at the root of the project 
+#______________________________________________________________________________
 
 
 #root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
 
-block_size = 2 # number of travels to compare
-skipped_row  = 0
+block_size = 2 # number of travels to compare when running this script
+
 if __name__ == "__main__":
 
     root = os.getcwd()
@@ -33,6 +36,8 @@ if __name__ == "__main__":
         with open(pooled_travels, mode='r') as file:
             computed_travels = pd.read_csv(file, sep=",",usecols=[0])
             computed_travels = computed_travels["id"].tolist()  
+
+    skipped_row  = 0 # counter for already computed travels
 
     with open(root+'/data/raw/ranked_mutualisations.csv', mode='r') as file:
         reader = csv.reader(file,delimiter=',')
