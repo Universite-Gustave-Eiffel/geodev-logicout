@@ -66,6 +66,9 @@ To run the code, run this command from the root of this project:
 python scripts/main.py 
 ```
 
+Change the `block_size` parameter in [`main.py`](https://github.com/Universite-Gustave-Eiffel/geodev-logicout/blob/2d8285dd33bffa4298774c5eaeac7d1933d5f43c/scripts/main.py#L22) 
+to the fix the number of evaluations you want to make by run (default is 20).
+
 ## Notebooks
 
 During the development of the project we use jupyter notebooks to show preliminary results and discuss technical issues. They are contained in the notebooks directory and are self-explanatory.

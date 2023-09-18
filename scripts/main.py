@@ -19,7 +19,7 @@ from tqdm import tqdm
 
 #root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
 
-block_size = 2 # number of travels to compare when running this script
+block_size = 20 # number of travels to compare when running this script
 
 if __name__ == "__main__":
 
