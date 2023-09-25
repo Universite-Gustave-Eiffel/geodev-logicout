@@ -59,8 +59,8 @@ Description of 'ranked_mutualisations.csv':
   - jaacard : Jaccard similarity index between the 2 routes
   - start_distance : Distance between the 2 routes starts
   - max_distance : maximal distance between the the starting point and the delivery points
-  - index : Distance index computed by
-  - index_with_jaacard : combination of the index distance and the Jaccard index.
+  - index : Distance index
+  - index_with_jaacard : combination of the index distance and the Jaccard index (the smaller the better
 
 ## Evaluating the mutualizations
 

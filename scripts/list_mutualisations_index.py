@@ -34,12 +34,12 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
     Returns:
         mutualisations (list) : List containg all ranked mutualisations for all rows of an dataframe
         with the following fields:
-        - id_simulation_right : simulation 
+        - id_simulation_right : ID of simulation that is compared to the studied delivery route simulation
         - jaacard : Jaccard similarity index between the 2 routes
         - start_distance : Distance between the 2 routes starts
         - max_distance : maximal distance between the the starting point and the delivery points
-        - index : Distance index computed by
-        - index_with_jaacard : combination of the index distance and the Jaccard index.
+        - index : Distance index
+        - index_with_jaacard : combination of the index distance and the Jaccard index (the smaller the better).
     """    
 
 
