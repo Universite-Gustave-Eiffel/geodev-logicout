@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import mutualisation
 from tqdm import tqdm
+from time import sleep
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #
@@ -57,6 +58,7 @@ if __name__ == "__main__":
                         #print(row_id) #delete this line
                         mutualisation.comparison(int(row[0]),int(eval(row[1])[0][0]),gdf)
                         row_counter +=1
+                        sleep(1) # pause 1 second before calling the API again
                         #print(row_counter)
                     else:
                         #print("Stopping loop")

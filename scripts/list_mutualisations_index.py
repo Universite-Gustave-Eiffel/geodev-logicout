@@ -10,15 +10,14 @@ warnings.filterwarnings('ignore')
 
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
 
+# Radius in meters
+radius_ = 100000
 
-radius_=100000
+# buffer size in meters
 buffer_hull_= 1000
 type_= 2
 geo_dataframe_logicout = use_data.create_gdf('simulations_reel_gdf.csv','cheflieu')
 aire = np.pi*radius_**2
-
-
-
 
 def calculate_mutualisations(geo_df,dist,buffer_hull,type):
     """
@@ -34,6 +33,13 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
 
     Returns:
         mutualisations (list) : List containg all ranked mutualisations for all rows of an dataframe
+        with the following fields:
+        - id_simulation_right : simulation 
+        - jaacard : Jaccard similarity index between the 2 routes
+        - start_distance : Distance between the 2 routes starts
+        - max_distance : maximal distance between the the starting point and the delivery points
+        - index : Distance index computed by
+        - index_with_jaacard : combination of the index distance and the Jaccard index.
     """    
 
 
@@ -67,20 +73,19 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
             mutualisations = mutualisations + [[geo_df['id_simulation'].iloc[[i]].values[0],""]]
     return mutualisations
 
-
-ranked_mutualisations = calculate_mutualisations(geo_dataframe_logicout,radius_,buffer_hull_,type_)
-
-
-
-
 if __name__ == "__main__":
+    print("in list_mutualisations_index.py")
 
-    with open(root + "/data/raw/" + 'ranked_mutualisations.csv', 'w') as f:
+    with open(root + "/data/raw/" + 'ranked_mutualisations.csv', 'w', newline='') as f:
         
         # using csv.writer method from CSV package
         write = csv.writer(f)
         fields = ['id_simulation', 'mutualisations'] 
-        write.writerow(fields)
+        write.writerow(fields) # write header
+        
+        # Pool delivery travels by proximity
+        ranked_mutualisations = calculate_mutualisations(geo_dataframe_logicout,radius_,buffer_hull_,type_)
+
         write.writerows(ranked_mutualisations)
 
 

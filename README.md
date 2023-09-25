@@ -52,6 +52,16 @@ For the purpose of this study we will only use the file `simulations_reel_gdf.cs
 Once you have this file, you have to create the file 'ranked_mutualisations.csv'. In this file you will find all the indexes for each tour, sorted in ascending order according to the general index.
 To obtain this file, you have to run the script named 'list_mutualisation_index.py'.
 
+Description of 'ranked_mutualisations.csv':
+- ID of the studied delivery route simulation
+- a list of each possible mutualization, with the following elements for each one (stored in a list): 
+  - id_simulation_right : simulation 
+  - jaacard : Jaccard similarity index between the 2 routes
+  - start_distance : Distance between the 2 routes starts
+  - max_distance : maximal distance between the the starting point and the delivery points
+  - index : Distance index computed by
+  - index_with_jaacard : combination of the index distance and the Jaccard index.
+
 ## Evaluating the mutualizations
 
 The script 'mutualisation.py' contains a function, "comparison", that takes two routes and make a request to Logicout to calucl the costs of an optimized mutualized itinerary
