@@ -49,8 +49,10 @@ This process will create the files `data/raw/simulations_gdf.csv` and `data/raw/
 
 For the purpose of this study we will only use the file `simulations_reel_gdf.csv` , that contains the selected data of 1097 simulations made in the Logicout application.
 
-Once you have this file, you have to create the file 'ranked_mutualisations.csv'. In this file you will find all the indexes for each tour, sorted in ascending order according to the general index.
-To obtain this file, you have to run the script named 'list_mutualisation_index.py'.
+## List mutualisations
+
+Run the script named 'list_mutualisation_index.py' to generate the 'ranked_mutualisations.csv'. 
+'ranked_mutualisations.csv' list all the indexes for each tour, sorted in ascending order according to the general index.
 
 Description of 'ranked_mutualisations.csv':
 - ID of the studied delivery route simulation
@@ -64,10 +66,11 @@ Description of 'ranked_mutualisations.csv':
 
 ## Evaluating the mutualizations
 
-The script 'mutualisation.py' contains a function, "comparison", that takes two routes and make a request to Logicout to calucl the costs of an optimized mutualized itinerary
+The script 'mutualisation.py' contains the 'comparison' function that takes two routes and make a request to the Logicout API to compute the costs of an itinerary.
 The informations are then stored in the file "gains.csv"
 
-The 'main.py' script loop through the file "ranked_simulation.csv" and run the function "comparison" for all the lines of the file 'ranked_mutualisations.csv', having as parameter an itinerary and its better mutualization. Note it comes commented by default to avoid an unintended execution, since it will make thousand request for the API and will possibly incur costs in terms of quota.
+The 'main.py' script loop through the file "ranked_simulation.csv" and run the function "comparison" for all the lines of the file 'ranked_mutualisations.csv', having as parameter an itinerary and its better mutualization (the one ranked 0). 
+Note it comes commented by default to avoid an unintended execution, since it will make thousand request for the API and will possibly incur costs in terms of quota.
 
 
 To run the code, run this command from the root of this project:
@@ -81,7 +84,9 @@ to the fix the number of evaluations you want to make by run (default is 20).
 
 ## Notebooks
 
-During the development of the project we use jupyter notebooks to show preliminary results and discuss technical issues. They are contained in the notebooks directory and are self-explanatory.
+During the development of the project, we use jupyter notebooks to show preliminary results and discuss technical issues. 
+They are contained in the notebooks directory and are self-explanatory.
+We keep them to show how some scripts work and and showcase some peculiar points.
 
 # Licence 
 
