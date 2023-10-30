@@ -51,8 +51,13 @@ For the purpose of this study we will only use the file `simulations_reel_gdf.cs
 
 ## List mutualisations
 
-Run the script named 'list_mutualisation_index.py' to generate the 'ranked_mutualisations.csv'. 
+Run the script named 'list_mutualisations_index.py' to generate the 'ranked_mutualisations.csv'. 
 'ranked_mutualisations.csv' list all the indexes for each tour, sorted in ascending order according to the general index.
+
+
+```python
+python scripts/list_mutualisations_index.py
+```
 
 Description of 'ranked_mutualisations.csv':
 - ID of the studied delivery route simulation
