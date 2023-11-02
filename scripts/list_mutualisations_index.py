@@ -1,12 +1,16 @@
 import use_data, IsInclude, indexes
 from shapely import wkt, hausdorff_distance
 import geopandas as gpd
+import pandas as pd
 import csv
 import os
 import numpy as np
 import warnings
 from tqdm import tqdm
 warnings.filterwarnings('ignore')
+
+import pyarrow.parquet as pq # file storage
+
 
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)  # relative path to the gitignore directory
 
@@ -63,30 +67,51 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
             # We calculate our index
             gdf = indexes.index(gdf,aire) 
 
-            # we prepare to save the results in a csv , sorted by the index for the best mutualisations
+            # we prepare to save the results in a csv , sorted by the composite index for the best mutualisations
             gdf = gdf.sort_values(by=['index_with_jaacard'])
+
             row = [[geo_df['id_simulation'].iloc[[i]].values[0],gdf[['id_simulation_right','jaacard','start_distance','max_distance','index','index_with_jaacard']].values.tolist()]]
             mutualisations = mutualisations + row
         
         #if there aren't any mutualisable itineraire
         else: 
-            mutualisations = mutualisations + [[geo_df['id_simulation'].iloc[[i]].values[0],""]]
+            mutualisations = mutualisations + [[geo_df['id_simulation'].iloc[[i]].values[0],"","","","","",""]]
     return mutualisations
 
 if __name__ == "__main__":
     print("in list_mutualisations_index.py")
 
-    with open(root + "/data/raw/" + 'ranked_mutualisations.csv', 'w', newline='') as f:
-        
-        # using csv.writer method from CSV package
-        write = csv.writer(f)
-        fields = ['id_simulation', 'mutualisations'] 
-        write.writerow(fields) # write header
-        
-        # Pool delivery travels by proximity
-        ranked_mutualisations = calculate_mutualisations(geo_dataframe_logicout,radius_,buffer_hull_,type_)
+    # Compute # Pool delivery travels by proximity
+    ranked_mutualisations = calculate_mutualisations(geo_dataframe_logicout,radius_,buffer_hull_,type_)
 
-        write.writerows(ranked_mutualisations)
+    # Unlist ranked mutualisations to transform it to a dataframe
+
+    dict_list = []
+    columns = ['id_simulation_right','jaacard','start_distance','max_distance','index','index_with_jaacard']
+    for liste in ranked_mutualisations:
+        print(f"In simulation {liste[0]}, {len(liste[1])}") #liste à casser !
+        for record in liste[1]:
+            temp_dict = dict({"id_simulation" : liste[0] })
+            temp_dict.update(zip(columns, record))
+            
+            dict_list.append(temp_dict)
+
+    # conversion to dataframe
+    simulations_df = pd.DataFrame(dict_list)
+     
+    # Storage
+    ## in a parquet format file
+    pq.write_table(simulations_df, 'ranked_mutualisations.parquet')
+   
+    ## in a CSV file
+    #with open(root + "/data/output/" + 'ranked_mutualisations.csv', 'w', newline='') as f:
+    #    
+    #    # using csv.writer method from CSV package
+    #    write = csv.writer(f)
+    #    fields = ['id_simulation', 'mutualisations'] 
+    #    write.writerow(fields) # write header 
+    #    
+    #    write.writerows(ranked_mutualisations) # write data
 
 
 
