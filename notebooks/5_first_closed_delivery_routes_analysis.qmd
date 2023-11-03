@@ -17,7 +17,10 @@ library(stringr)
 library(purrr)
 library(tidyr)
 library(ggplot2)
+library(arrow, warn.conflicts = FALSE)
 ```
+
+raw_data
 
 ```{r read-data}
 raw_data <- readr::read_csv("../data/raw/ranked_mutualisations.csv") 
@@ -66,6 +69,10 @@ ggplot(occurences, aes(x=count, y = n)) + geom_bar(stat="identity") +
 ```
 
 ```{r}
-
+ggplot(grouped_data %>% group_by(count) %>% count(sort = TRUE), aes(x=count, y = n)) + geom_bar(stat="identity")
 ```
 
+```{r read-parquet-file}
+data <- arrow::read_parquet("data/output/ranked_mutualisations.parquet")
+data
+```

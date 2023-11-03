@@ -9,6 +9,7 @@ import warnings
 from tqdm import tqdm
 warnings.filterwarnings('ignore')
 
+import pyarrow as pa
 import pyarrow.parquet as pq # file storage
 
 
@@ -79,29 +80,31 @@ def calculate_mutualisations(geo_df,dist,buffer_hull,type):
     return mutualisations
 
 if __name__ == "__main__":
-    print("in list_mutualisations_index.py")
 
-    # Compute # Pool delivery travels by proximity
+    # Compute Pool delivery travels by proximity
     ranked_mutualisations = calculate_mutualisations(geo_dataframe_logicout,radius_,buffer_hull_,type_)
 
-    # Unlist ranked mutualisations to transform it to a dataframe
+    # Storage
+    ## To a parquet file (can be read efficiently by Python and R)
 
+    ### Unlist ranked mutualisations to transform them to a list of dict
     dict_list = []
     columns = ['id_simulation_right','jaacard','start_distance','max_distance','index','index_with_jaacard']
     for liste in ranked_mutualisations:
-        print(f"In simulation {liste[0]}, {len(liste[1])}") #liste à casser !
+        # For each simulation that can be mutualized, create a dict with indexes infos from the list
         for record in liste[1]:
             temp_dict = dict({"id_simulation" : liste[0] })
             temp_dict.update(zip(columns, record))
             
             dict_list.append(temp_dict)
 
-    # conversion to dataframe
+    ### convert dictionnaries to a dataframe
     simulations_df = pd.DataFrame(dict_list)
-     
-    # Storage
-    ## in a parquet format file
-    pq.write_table(simulations_df, 'ranked_mutualisations.parquet')
+    ### convert to an Arrow table before writing parquet file (can't write directly to parquet from a dataframe)
+    table = pa.Table.from_pandas(simulations_df)
+    
+    ## Write in a parquet format file 
+    pq.write_table(table, root + "/data/output/" +'ranked_mutualisations.parquet')
    
     ## in a CSV file
     #with open(root + "/data/output/" + 'ranked_mutualisations.csv', 'w', newline='') as f:
