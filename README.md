@@ -51,8 +51,23 @@ For the purpose of this study we will only use the file `simulations_reel_gdf.cs
 
 ## List mutualisations
 
-Run the script named 'list_mutualisation_index.py' to generate the 'ranked_mutualisations.csv'. 
+Run the script named 'list_mutualisations_index.py' to generate the 'ranked_mutualisations.csv'. 
 'ranked_mutualisations.csv' list all the indexes for each tour, sorted in ascending order according to the general index.
+
+
+```python
+python scripts/list_mutualisations_index.py
+```
+
+Description of 'ranked_mutualisations.csv':
+- ID of the studied delivery route simulation
+- a list of each possible mutualization, with the following elements for each one (stored in a list): 
+  - id_simulation_right : simulation 
+  - jaacard : Jaccard similarity index between the 2 routes
+  - start_distance : Distance between the 2 routes starts
+  - max_distance : maximal distance between the the starting point and the delivery points
+  - index : Distance index
+  - index_with_jaacard : combination of the index distance and the Jaccard index (the smaller the better
 
 ## Evaluating the mutualizations
 
@@ -61,6 +76,16 @@ The informations are then stored in the file "gains.csv"
 
 The 'main.py' script loop through the file "ranked_simulation.csv" and run the function "comparison" for all the lines of the file 'ranked_mutualisations.csv', having as parameter an itinerary and its better mutualization (the one ranked 0). 
 Note it comes commented by default to avoid an unintended execution, since it will make thousand request for the API and will possibly incur costs in terms of quota.
+
+
+To run the code, run this command from the root of this project:
+
+```python
+python scripts/main.py 
+```
+
+Change the `block_size` parameter in [`main.py`](https://github.com/Universite-Gustave-Eiffel/geodev-logicout/blob/2d8285dd33bffa4298774c5eaeac7d1933d5f43c/scripts/main.py#L22) 
+to the fix the number of evaluations you want to make by run (default is 20).
 
 ## Notebooks
 

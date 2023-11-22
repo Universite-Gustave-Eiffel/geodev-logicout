@@ -148,7 +148,10 @@ def index(geodataframe,area):
         geodataframe {geopandas Geodataframe}: a geodataframe of the mutualisables itineraires for the given row
 
     """            
-
+    
+    # Distance index
     geodataframe['index']= geodataframe['start_distance'] * geodataframe['max_distance'] / area
+
+    # Combining distance index with Jaccard index
     geodataframe['index_with_jaacard'] = geodataframe['index'] * (1-geodataframe['jaacard'])
     return geodataframe

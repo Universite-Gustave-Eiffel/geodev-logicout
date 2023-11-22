@@ -6,7 +6,12 @@ import api_logicout
 import use_data
 import csv
 import os
+
 root = os.path.join(os.path.dirname( __file__ ), os.pardir)
+
+# Path to output files
+gains_file = 'data/output/gains.csv'
+pooled_travels = 'data/output/trajets_mutualises.csv'
 
 def route_calculation(RouteA,RouteB):
     """
@@ -16,6 +21,8 @@ def route_calculation(RouteA,RouteB):
     Args:
         RouteA (Array): An array of coordinates /!\ Latitude THEN longitude
         RouteB (Array): An array of coordinates /!\ Latitude THEN longitude
+    
+    Returns the new path as a Numpy ndarray
     """
     #We merge the two sets of coordinates together
     merged_coord = np.append(RouteA,RouteB,axis=0)
@@ -38,7 +45,7 @@ def route_calculation(RouteA,RouteB):
         rearranged_coord[i] = merged_coord[permutation[i]]
     #We just have to put back the first point of A at the end.
     path = rearranged_coord
-    
+
     return(path)
 
 def comparison(idA,idB,gdf):
@@ -49,7 +56,14 @@ def comparison(idA,idB,gdf):
         idA (int): The index of the first route(A)
         idB (int): The index of the second route(B)
         gdf (geodataframe): A gdf containing data on all the routes (created from simulation_reel_gdf.csv)
+    
+    Writes in trajets_mutualises.csv the pooled travels and in gains.csv, 
+    the difference between the sum of all emissions and cost of the two original travels
+    and thoses of the pooled travel.
+
+    Returns the emissions and costs of the pooled travel and of the two original travels
     """
+
     #Getting the array containing the coordinates of the two routes
     gdf['itineraire'] = gdf.geometry.to_crs(4326)
     
@@ -61,7 +75,7 @@ def comparison(idA,idB,gdf):
     )
     #Computing the new path
     traj_mutu = route_calculation(trajA,trajB)
-    print('Le trajet mutualisé est'+str(traj_mutu))
+    #print('Le trajet mutualisé est'+str(traj_mutu))
     
     #We need to stock the data about the prodcuer A vehicle, since it will be the one who takes in charge both products
     V_info = []
@@ -90,8 +104,8 @@ def comparison(idA,idB,gdf):
                     V_info.append('GF')
             if int(row[0]) == idB:
                 CostB = float(row[21])
-    print(V_info)
-    print(CostA,CostB)
+    #print(V_info)
+    #print(CostA,CostB)
     #Sending the new path to the logicout API with A's vehicule data, since he will carry the products
 
     results = {'parametres_vehicule': {'type_vehicule': 'Vehicule utilitaire frigorifique < 3,5 t', 'infos_vehicule': 'Grand fourgon diesel Euro 4', 'cout_vehicule_forfait': 0.0, 'cout_vehicule_km': 0.5759000000000001}, 'couts': {'total': 259.61049843333336, 'vehicule': 181.40216510000002, 'conduite': 50.708333333333336, 'livraison': 5.0, 'autres_activites': 22.5, 'autres_couts': 0.0}, 'temps_passe': {'total': 312.83333333333337, 'conduite': 202.83333333333334, 'livraison': 20.0, 'autre': 90.0}, 'kilometrage': 314.989, 'emissions': {'COV': 11.024615, 'CO2': 79981.376902, 'NH3': 0.3779868, 'CO': 118.120875, 'NOX': 261.755859, 'CH4': 0.0626505765659207, 'PB': 0.00131350413, 'PS': 12.8830501, 'N2O': 2.834901, 'SO2': 0.07559736}, 'cout_collectif': 5.883212963129608}
@@ -101,6 +115,7 @@ def comparison(idA,idB,gdf):
     #id,tps,dist,CO_g,COV_g,NOX_g,NH3_g,PB_g,SO2_g,PS_g,CO2_g,N2O_g,CH4_g,cout_collectif
     dataA = [idA,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     dataB = [idB,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
     with open(root +'/data/raw/trajet.csv', mode='r') as file:
         reader = csv.reader(file)
         #Ignore the header
@@ -136,9 +151,16 @@ def comparison(idA,idB,gdf):
                 dataB[12]+=float(row[21])
                 dataB[13]+=float(row[22])
                 dataB[14] = CostB
+
     field_names = ['id','idA','idB','tps_min','distance_km','cout','CO_g','COV_g','NOX_g','NH3_g','PB_g','SO2_g','PS_g','CO2_g','N2O_g','CH4_g','cout_collectif']
-    with open('trajets_mutualises.csv', mode='a', newline='') as file:
+    
+    file_exist  =  os.path.exists(pooled_travels) # test if file already exist
+    with open(pooled_travels, mode='a', newline='') as file:
         writer = csv.DictWriter(file,fieldnames=field_names)
+
+        if not file_exist : # print csv header if new file, otherwise do nothing
+            writer.writeheader()
+     
         writer.writerow(
             {'id': str(idA)+"_"+str(idB) ,
              'idA': idA ,
@@ -158,8 +180,16 @@ def comparison(idA,idB,gdf):
              'CH4_g': results['emissions']['CH4'],
              'cout_collectif': results['cout_collectif']}
         )
-    with open('gains.csv', mode='a', newline='') as file:
+
+
+    gains_file_exist  =  os.path.exists(gains_file) # test if file already exist
+
+    with open(gains_file, mode='a', newline='') as file:
         writer = csv.DictWriter(file,fieldnames=field_names)
+
+        if not gains_file_exist : # print csv header if new file, otherwise do nothing
+            writer.writeheader()
+            
         writer.writerow(
             {'id': str(idA)+"_"+str(idB) ,
              'idA': idA ,

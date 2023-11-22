@@ -1,0 +1,78 @@
+---
+title: "Most central delivery routes"
+format:
+  html:
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+editor: visual
+---
+
+```{r setup}
+library(readr)
+library(dplyr)
+library(stringr)
+library(purrr)
+library(tidyr)
+library(ggplot2)
+library(arrow, warn.conflicts = FALSE)
+```
+
+raw_data
+
+```{r read-data}
+raw_data <- readr::read_csv("../data/raw/ranked_mutualisations.csv") 
+```
+
+```{r data-cleaning}
+# transform list to tibble
+# remove extra characters
+# pivot the table
+# keep only the 5 first (mutualisations_1 is removed because empty)
+clean_data <- raw_data %>%
+  mutate(mutualisations = str_extract_all(mutualisations, regex("\\[\\d*"))) %>%  unnest_wider(mutualisations, names_sep = "_") %>%  select(!c('mutualisations_1'))%>% select(1:6) %>% pivot_longer(!'id_simulation', names_to = "toto" ) %>%  select(!c('toto'))  %>% mutate(value = str_remove(value, pattern = '\\['))
+
+dataset_size <- nrow(raw_data)
+```
+There is `r dataset_size` delivery routes in this dataset.
+
+```{r group-data}
+grouped_data <- clean_data %>% group_by(value) %>% count(name = "count", sort = TRUE)
+
+NAs <- grouped_data %>% filter(is.na(value))
+
+grouped_data <- grouped_data %>% filter(!is.na(value))
+```
+
+`r NAs["count"]` delivery routes (`r round(NAs["count"]*100/dataset_size, 2)`% of total) match no other delivery routes within the 100 km range.
+
+# Number of citations
+
+This table and graph show the number of citation a delivery route gets from other delivery routes.
+
+Most get at least one citation within a 100 km radius.
+
+
+
+```{r occurences-table}
+xlab= "Number of citations"
+ylab = 'Count'
+occurences <- grouped_data %>% group_by(count) %>% count(sort = TRUE)
+occurences %>% knitr::kable(col.names = c(xlab, ylab))
+```
+
+```{r occurences-graph}
+ggplot(occurences, aes(x=count, y = n)) + geom_bar(stat="identity") +
+  labs(x = xlab, y =  ylab, title = "Repartition of the number of citations")
+```
+
+```{r}
+ggplot(grouped_data %>% group_by(count) %>% count(sort = TRUE), aes(x=count, y = n)) + geom_bar(stat="identity")
+```
+
+```{r read-parquet-file}
+data <- arrow::read_parquet("data/output/ranked_mutualisations.parquet")
+data
+```
