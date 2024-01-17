@@ -1,0 +1,484 @@
+---
+title: "Logicout dataset description"
+format:
+  html:
+    embed-resources: true
+editor: visual
+lang: en
+number-sections: true
+toc: true
+knitr:
+  opts_chunk: 
+    collapse: true
+    R.options:
+      digits: 2
+execute:
+  echo: false
+  message: false
+  warning: false
+---
+
+```{=html}
+<!-- TODO
+
+- DONE Nombre de tournées totales analysées
+- DONE Nombre d’utilisateurs total, 
+- DONE nombre de tournées moyen/median/min/max par utilisateur, 
+- nombre de tournées moyen/median/min/max par XY des points de départs (fermes), 
+- nombre de points livrés moyen/median/ min/max par tournées,
+- Nombre de traces directes (un seul point livré)
+
+Si c’est possible pour toi, ça serait encore mieux sous forme de graphique: 
+- DONE Fréquence / nombre de points livrés par tournée, 
+- DONE fréquence/nombre de tournée par utilisateur,
+TODO fréquence/nombre de tournée par ferme (XY)
+
+DONE Distance moyen/median/min/max par tournée, Distance moyen/median/min/max par tournée ramenée au nombre de points livrés dans la tournée (ratio ?)
+
+DONE Si c’est possible pour toi, ça serait encore mieux sous forme de graphique: Fréquence /km parcouru dans la tournée,
+voir @round-distances-repartition 
+
+--> 
+
+```
+```{r setup}
+#| message: false
+#| warning : false
+library(arrow)
+library(dplyr)
+library(here)
+library(ggplot2)
+library(sf)
+# library(purrr)
+
+data_description <- function(x) {
+  dplyr::tibble(
+    min = min(x),
+    mean = mean(x),
+    median = median(x),
+    max = max(x)
+  )
+}
+```
+
+```{r data-prep}
+
+## Real simulations (supposed, not tests or demos)
+simulations <- arrow::read_delim_arrow(file = here::here("data", "raw", "simulations_reel_gdf.csv"), delim = ";", decimal_point = ".")
+
+# get vhl data
+simulations_vhl <- arrow::read_delim_arrow(file = here::here("data", "raw", "simulation.csv"), delim = ";", decimal_point = ".")%>% dplyr::filter(type_simulation == "reel") %>% dplyr::semi_join(simulations)
+
+# get user data
+users <- simulations %>% dplyr::group_by(id_utilisateur) %>% count(name = "count", sort = TRUE) 
+
+user_count <- length(unique(simulations$id_utilisateur))
+
+## trips (rountes between 2 stops)
+trips <- arrow::read_delim_arrow(file = here::here("data", "raw", "trajet.csv"), delim = ",", decimal_point = ".") %>% dplyr::select(-polyligne) %>% dplyr::inner_join(simulations, by = join_by(id_simulation))
+
+grouped_trips <- trips %>% group_by(id_simulation)
+
+## Stops
+stops <- arrow::read_delim_arrow(file = here::here("data", "raw", "point_arret.csv"), delim = ",", decimal_point = ".") %>% dplyr::inner_join(simulations, by = join_by(id_simulation)) %>% group_by(id_simulation) %>% count(name = "stops", sort = TRUE) %>%
+  dplyr::mutate(stops = stops - 1) #remove the starting point
+
+## Ranked mutualisations
+ranked_mutualisations <- arrow::read_parquet(here::here("data", "output", "ranked_mutualisations.parquet"))
+# ranked_mutualisations %>% dplyr::glimpse()
+
+# get info about Euro emission standards
+euro_standards <- arrow::read_delim_arrow(file = here::here("data", "raw", "emissions indicateurs vehicule norme euro.csv"), delim = ";", decimal_point = ".") %>% dplyr::mutate(description  = sprintf("Euro %s (%s)", norme_euro, motorisation))
+```
+
+# Vocabulary
+
+A round  (*Tournée* in French) corresponds to a delivery round. 
+It is composed by a serie of stops where the deliveries are made and trips (or *segment*).
+A trip is the travel between 2 stops.
+
+# Rounds distance analysis
+
+There is `r dim(simulations)[1]` simulations of trips that are considered as corresponding to real delivery routes. This is on this subset we are working on.
+
+Those simulations have been made by `r user_count` distinct users.
+
+## Number of simulations by user
+
+```{r}
+#| label: fig-simulation-by-users-repartition
+#| fig-cap: "Number of simulations by user"
+
+ggplot2::ggplot(users, aes(count))+
+  geom_bar( width=0.7, fill="#2f2a85")+
+  theme_minimal() + xlab("Number of simulations")+ ggtitle("Number of simulations by unique users")
+```
+
+```{r}
+#| label: tbl-simulations-by-user-description
+#| tbl-cap: "Number of simulations by user"
+
+data_description(users$count) %>% knitr::kable()
+```
+
+The mean number of simulation by user is `r mean(users$count)`
+
+`r dim(users[users$count ==1,])[1]` users (`r 100*dim(users[users$count ==1,])[1]/user_count`%) have done only one simulation.
+
+## Stops
+
+The number of stops by delivery route is, in average of `r mean(stops$stops)`, where the median is about `r median(stops$stops)`.
+
+There is at least `r min(stops$stops)` stops (direct delivery) and the maximum is `r max(stops$stops)`.
+
+## Stops repartition
+
+```{r}
+#| tbl-cap: "Number of stops by delivery round"
+#| label: tbl-stops-description
+#| eval: true
+data_description(stops$stops) %>% knitr::kable()
+```
+
+```{r}
+#| fig-cap: "Number of stops by delivery route repartition"
+#| label: fig-stops-repartition
+ggplot2::ggplot(stops, aes(x=factor(stops)))+
+  geom_bar(stat="count", width=0.7, fill="#2f2a85")+
+  theme_minimal() + xlab("Number of stops")+ ggtitle("Number of stops by delivery route repartition")
+```
+
+### Rounds with the largest number of stops (more than 30)
+
+```{r}
+stops %>% dplyr::filter(stops > 30) %>% knitr::kable() 
+```
+
+## Rounds
+### Rounds distance (in kilometers)
+
+```{r}
+#| label: tbl-rounds-distance-stats
+#| tbl-cap: Delivery rounds distances (in kilometers)
+
+distances <- grouped_trips %>% dplyr::summarise(round_distance = mean(kilometrage), stops = n()) 
+
+data_description(distances$round_distance) %>% knitr::kable()
+```
+
+```{r round-distances-repartition}
+#| fig-cap: "Repartition by total distance of rounds"
+#| label: fig-round-distances-repartition
+ggplot2::ggplot(distances, aes(x=round_distance))+
+  geom_histogram( fill="#2f2a85")+
+  theme_minimal() + xlab("Round total distance")+ ggtitle("Round total distance repartition")
+```
+
+### Rounds distance by number of stops ratio
+
+Obviously, the longest rounds should have the more stops. Let's see that.
+
+```{r distances-tops}
+#| label: tbl-distance-tops
+#| tbl-cap: Longuest delivery rounds (in distance)
+distances  %>%
+    dplyr::arrange(desc(round_distance)) %>%
+    dplyr::slice(1:10) %>% knitr::kable()
+```
+
+Well, it does not seems true at all.
+
+```{r distance-ratio}
+#| label: tbl-distance-ratio
+#| tbl-cap: Distance ratios (distance by number of stops)
+distances <- distances %>% mutate(ratio = round_distance/stops)
+distances  %>%
+    dplyr::arrange(desc(ratio))%>%
+    dplyr::slice(1:10) %>% knitr::kable()
+```
+```{r}
+#| label: tbl-distance-ratio-data-description
+#| tbl-cap: Distance ratios (distance by number of stops)
+
+distances_quantiles <- quantile(distances$ratio, prob = seq(0, 1, length = 11), type = 5)
+
+data_description(distances$ratio) %>% knitr::kable()
+```
+
+
+```{r}
+#| label: fig-distance-ratio-graph
+#| fig-cap: Distance by stops repartition
+
+ggplot2::ggplot(distances, aes(x=ratio))+
+  geom_histogram( fill="#2f2a85")+
+  theme_minimal() + xlab("Mean distance between 2 stops")+ ggtitle("Distance by stops repartition")
+```
+
+We can see that stops are generally close to each other (less 5 km in 60% of cases, less than 20 km in 90% of cases).
+
+### Long trips
+
+This part looks at the rounds where the distance between 2 stops is greater than `r distances_quantiles["90%"]` kilometers.
+
+```{r}
+#| label: long-trips
+
+long_trips <- distances %>% filter(ratio > distances_quantiles["90%"])
+```
+
+In fact, it seems that it is the opposite, longest trips have very few stops.
+For those `r dim(long_trips)[1]` rounds with long trips, the minimal number of stops is `r min(long_trips$stops)` and the maximum is `r max(long_trips$stops)`.
+
+```{r}
+#| label: fig-long-trips-graph
+#| fig-cap: Number of stops in round with long trips between 2 stops repartition
+
+ggplot2::ggplot(long_trips, aes(x=stops))+
+  geom_histogram( fill="#2f2a85")+
+  theme_minimal() + xlab("Number of stops")+ ggtitle("Number of stops in round with long trips between 2 stops repartition")
+```
+
+```{r}
+#| label: fig-long-trips-distance-graph
+#| fig-cap: Total distance of the rounds with long trips
+
+ggplot2::ggplot(long_trips, aes(x=round_distance))+
+  geom_histogram( fill="#2f2a85")+
+  scale_x_continuous(name = "Round distance", breaks= seq(20,280, 20)) +
+  theme_minimal() + ggtitle("Total distance of the rounds with long trips")
+```
+
+
+# Costs analysis
+
+<!--
+Temps de conduite moyen/median/min/max par tournée,
+
+Cout éco moyen/median/min/max par tournée,
+
+Cout environnemental moyen/median/min/max par tournée,
+
+Si c’est possible pour toi, ça serait encore mieux sous forme de graphique: Fréquence /cout eco d’une tournée, fréquence/cout env. par tournée, fréquence/temps passé à conduire par tournée
+-->
+
+## Driving time
+
+```{r}
+#| label: tbl-driving-time-data_description
+#| tbl-cap: Driving time (in minutes), by delivery round
+driving_times <- grouped_trips %>% summarise(driving_time = sum(temps_conduite_min))
+data_description(driving_times$driving_time) %>% knitr::kable()
+```
+
+```{r driving-time-quantiles}
+#| echo: false
+#| eval: false
+quantile(driving_times$driving_time, prob = seq(0, 1, length = 11), type = 5)
+```
+
+
+```{r driving-time-data_description}
+#| label: fig-driving-time-repartition 
+#| fig-cap: Driving time repartition
+ggplot2::ggplot(driving_times, aes(x=driving_time))+
+  geom_histogram( fill="#2f2a85")+
+  theme_minimal() + xlab("Driving times (in minutes)")+ ggtitle("Driving times repartition")
+```
+
+## Collective cost
+
+
+```{r collective-costs-data_description}
+#| label: tbl-collective-costs-data_description
+#| tbl-cap: Repartition of all vehicles, by type
+collective_cost <- grouped_trips %>% summarise(collective_cost = sum(`cout collectif`))
+data_description(collective_cost$collective_cost) %>% knitr::kable()
+```
+
+```{r collective-costs-quantiles}
+#| echo: false
+#| eval: false
+#| label: tbl-collective-costs-quantiles
+#| tbl-cap: Repartition of all vehicles, by type
+quantile(collective_cost$collective_cost, prob = seq(0, 1, length = 11), type = 5)
+```
+
+
+```{r collective-costs-data_description}
+#| label: fig-eco-costs-repartition 
+#| fig-cap: Collective cost repartition
+ggplot2::ggplot(collective_cost, aes(x=collective_cost))+
+  geom_histogram( fill="#2f2a85")+
+  theme_minimal() + xlab("Collective costs (in euros)")+ ggtitle("Repartition of collective cost")
+```
+
+### Collective by distance
+
+```{r}
+distances <- distances %>% dplyr::left_join(collective_cost) %>% mutate( cost_by_km = collective_cost / round_distance)
+```
+
+
+```{r}
+#| label: fig-collective-costs-distance 
+#| fig-cap: Collective cost by distance
+ggplot2::ggplot(distances, aes(x=round_distance, y = collective_cost))+
+  geom_point() + geom_smooth()
+```
+
+
+## Environmental costs
+
+
+```{r } 
+#| echo: false
+#| output: asis
+#| label: tbl-rounds-emissions
+#| tbl-cap: "Estimated emissions by polluant"
+# sums all trips value by simulation
+round_sums <- grouped_trips %>%
+  summarise(across(ends_with("_g"), ~ sum(.x, na.rm = TRUE)))
+
+# Compute min, mean, median and max values by delivery round
+emissions <- round_sums %>%
+  reframe(across(ends_with("_g"), data_description)) 
+
+# Create Markdown table for each polluant
+emissions_table <- lapply(emissions, knitr::kable)
+
+
+# For each polluant create title and print table in document
+for (name in names(emissions_table)) {
+  cat('#### ', name, '\n')
+  print(emissions_table[name][[1]])
+  cat('\n')
+}
+
+
+```
+
+# Vehicule analysis
+
+<!--
+
+Type de véhicule dans les tournées : nombre de véhicule particulier total par type (VP: type de 1 à 63 cf fichier joint émission norme euro véhicule), nombre de VUL total par type (VUL: type de 1 à 14 cf fichier joint), nombre de poids lourds total par type (PL: type de 1 à 29 cf fichier joint)
+
+Nombre moyen/median/min/max de points de livraison par VUL, VP et PL 
+-->
+```{r vhl-data}
+vhl_data <- simulations %>% 
+  dplyr::left_join( # join the data with information on vehicles
+    simulations_vhl %>% dplyr::select(-id_utilisateur) , 
+    by = dplyr::join_by(id_simulation == id)) %>% 
+  dplyr::select(starts_with("id_") | starts_with("nb_")) # keep only data about VHL
+```
+
+```{r vhl-type}
+#| label: tbl-vhl-type
+#| tbl-cap: Repartition of all vehicles, by type
+vhl_types <- vhl_data %>% dplyr::mutate(
+  vhl_type = dplyr::case_when(
+    startsWith(id_vehicule,"VP") ~ "personal vehicule",
+    startsWith(id_vehicule,"VUL") ~ "light utility vehicle",
+    startsWith(id_vehicule,"PL") ~ "truck"
+  )
+) %>% 
+  # tibble::view()
+dplyr::group_by(vhl_type) 
+vhl_types %>% dplyr::tally(name = "count") %>% knitr::kable()
+```
+
+```{r vhl-motorisation}
+#| label: tbl-motorisation
+#| tbl-cap: Repartition of all vehicles, by motorisation
+vhl_motorisation <- vhl_data %>%  left_join(euro_standards %>% select(identifiant, motorisation), by = join_by(id_vehicule  == identifiant)) %>% dplyr::group_by(motorisation) %>% count(name = "count",sort = TRUE)
+vhl_motorisation %>% knitr::kable()
+```
+
+## Private vehicle
+```{r vp-type}
+#| label: tbl-vp-by-class
+#| tbl-cap: Repartition of personal vehicles, by emission class
+vp_data<- vhl_data %>% dplyr::filter(stringr::str_detect(id_vehicule, "VP_"))
+vp_standards  <- vp_data %>% dplyr::group_by(id_vehicule) %>% tally(sort = TRUE, name = "count")
+
+vp_standards <- vp_standards %>% left_join(euro_standards %>% select(identifiant, description), by = join_by(id_vehicule  == identifiant)) %>% dplyr::relocate(id_vehicule, description, count)
+
+vp_standards %>% knitr::kable()
+```
+
+```{r vp-type-graph}
+#| label: fig-vp-class-repartition 
+#| fig-cap: Repartition of personnal vehicles, by emission class
+ggplot2::ggplot(vp_standards , aes(x=description, y= count))+
+  geom_col( fill="#2f2a85")+
+  theme_minimal() + xlab("Emission class")+ ggtitle("Repartition of personnal vehicles, by emission class") + coord_flip()
+```
+
+## Light utility vehicle
+```{r vul-type}
+#| label: tbl-vul-by-class
+#| tbl-cap: Repartition of light utility vehicles, by emission class
+vul_data<- vhl_data %>% dplyr::filter(stringr::str_detect(id_vehicule, "VUL_"))
+vul_standards  <- vul_data %>% dplyr::group_by(id_vehicule) %>% tally(sort = TRUE, name = "count")
+
+vul_standards <- vul_standards %>% left_join(euro_standards %>% select(identifiant, description), by = join_by(id_vehicule  == identifiant)) %>% dplyr::relocate(id_vehicule, description, count)
+
+vul_standards %>% knitr::kable()
+```
+
+```{r vul-type-graph}
+#| label: fig-vul-class-repartition 
+#| fig-cap: Repartition of light utility vehicles, by emission class
+ggplot2::ggplot(vul_standards , aes(x=description, y= count))+
+  geom_col( fill="#2f2a85")+
+  theme_minimal() + xlab("Emission class")+ ggtitle("Repartition of light utility vehicles, by emission class")+
+  coord_flip()
+```
+
+## Trucks
+```{r trucks-type}
+#| label: tbl-trucks-by-class
+#| tbl-cap: Truck repartition by emission class
+trucks_data<- vhl_data %>% dplyr::filter(stringr::str_detect(id_vehicule, "PL_"))
+trucks_standards  <- trucks_data %>% dplyr::group_by(id_vehicule) %>% tally(sort = TRUE, name = "count")
+
+trucks_standards <- trucks_standards %>% left_join(euro_standards %>% select(identifiant, description), by = join_by(id_vehicule  == identifiant)) %>% dplyr::relocate(id_vehicule, description, count)
+
+trucks_standards %>% knitr::kable()
+```
+
+```{r trucks-type-graph}
+#| label: fig-trucks-class-repartition 
+#| fig-cap: Repartition of trucks, by emission class
+ggplot2::ggplot(trucks_standards , aes(x=description, y= count))+
+  geom_col( fill="#2f2a85")+
+  theme_minimal() + xlab("Emission class")+ ggtitle("Repartition of trucks, by emission class")
+```
+
+## Deliveries by vehicule type
+
+```{r}
+#| label: tbl-delivery-points-total
+#| tbl-cap: Number of delivery points by vehicle type
+vhl_types %>% summarise(delivery_points = sum(nb_points_livres))  %>% knitr::kable()
+
+```
+
+```{r}
+#| label: tbl-delivery-points-by-type
+#| tbl-cap: Delivery points by vehicle type
+temp <- vhl_types %>% summarise(delivery_points = data_description(nb_points_livres)) 
+temp <- cbind(temp$vhl_type, temp$delivery_points) 
+
+temp %>% dplyr::rename(`Vehicle type`  = `temp$vhl_type`) %>% knitr::kable()
+```
+
+# Reproducibility {.unnumbered}
+
+
+```{r session-description}
+#here::here()
+xfun::session_info(dependencies = FALSE)
+```
